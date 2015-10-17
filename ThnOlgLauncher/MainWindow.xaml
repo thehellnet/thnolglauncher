@@ -1,0 +1,24 @@
+﻿<Window x:Name="mainWindow" x:Class="ThnOlgLauncher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ThnOlgLauncher"
+        mc:Ignorable="d"
+        Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded">
+    <Grid>
+        <Button x:Name="exitButton" Content="Exit" Margin="10,0,0,10" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Bottom" Click="exitButton_Click"/>
+        <Button x:Name="launchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="launchButton_Click"/>
+        <ListView x:Name="listView" Margin="10,10,10,37" SelectionChanged="listView_SelectionChanged">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Description" Width="Auto" DisplayMemberBinding="{Binding name}"/>
+                    <GridViewColumn Header="Game" Width="Auto" DisplayMemberBinding="{Binding game.name}"/>
+                    <GridViewColumn Header="Address" Width="Auto" DisplayMemberBinding="{Binding address}"/>
+                    <GridViewColumn Header="Port" Width="Auto" DisplayMemberBinding="{Binding port}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+    </Grid>
+</Window>
