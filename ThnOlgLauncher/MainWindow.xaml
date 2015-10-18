@@ -7,18 +7,34 @@
         mc:Ignorable="d"
         Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded">
     <Grid>
-        <Button x:Name="exitButton" Content="Exit" Margin="10,0,0,10" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Bottom" Click="exitButton_Click"/>
-        <Button x:Name="launchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="launchButton_Click"/>
-        <ListView x:Name="listView" Margin="10,10,10,37" SelectionChanged="listView_SelectionChanged">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Description" Width="Auto" DisplayMemberBinding="{Binding name}"/>
-                    <GridViewColumn Header="Game" Width="Auto" DisplayMemberBinding="{Binding game.name}"/>
-                    <GridViewColumn Header="Address" Width="Auto" DisplayMemberBinding="{Binding address}"/>
-                    <GridViewColumn Header="Port" Width="Auto" DisplayMemberBinding="{Binding port}"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
-
+        <TabControl x:Name="tabControl" Margin="10,10,10,37" SelectionChanged="tabControl_SelectionChanged">
+            <TabItem x:Name="serverTab" Header="Servers">
+                <Grid Background="White">
+                    <DataGrid x:Name="serverList" Margin="10" SelectionChanged="serverList_SelectionChanged" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverList_CellEditEnding" EnableRowVirtualization="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Description" Width="Auto" Binding="{Binding name}"/>
+                            <DataGridTextColumn Header="Game" Width="Auto" Binding="{Binding gameTag}"/>
+                            <DataGridTextColumn Header="Address" Width="Auto" Binding="{Binding address}"/>
+                            <DataGridTextColumn Header="Port" Width="Auto" Binding="{Binding port}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="gameTab" Header="Games">
+                <Grid Background="White">
+                    <DataGrid x:Name="gameList" Margin="10" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="gameList_CellEditEnding" EnableRowVirtualization="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding name}"/>
+                            <DataGridTextColumn Header="Tag" Width="Auto" Binding="{Binding tag}"/>
+                            <DataGridTextColumn Header="Executable" Width="Auto" Binding="{Binding executable}"/>
+                            <DataGridCheckBoxColumn Header="Run as Admin" Width="Auto" Binding="{Binding runAsAdmin}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Button x:Name="exitButton" Content="Exit" Margin="10,0,0,10" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Bottom" Click="exitButton_Click" Grid.Row="1"/>
+        <Button x:Name="launchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="launchButton_Click" Grid.Row="1"/>
+        <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="115,0,0,10" Width="100" Click="saveButton_Click" IsEnabled="False" Height="22" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

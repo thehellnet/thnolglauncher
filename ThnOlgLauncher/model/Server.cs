@@ -9,7 +9,7 @@ namespace ThnOlgLauncher.model
     class Server
     {
         public String name { get; set; }
-        public Game game { get; set; }
+        public String gameTag { get; set; }
         public String address { get; set; }
         public UInt16 port { get; set; }
     }

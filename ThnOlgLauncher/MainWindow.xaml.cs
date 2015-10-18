@@ -15,69 +15,56 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ThnOlgLauncher.controller;
 using ThnOlgLauncher.model;
+using static System.Environment;
 
-namespace ThnOlgLauncher
-{
+namespace ThnOlgLauncher {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
-    {
-
+    public partial class MainWindow : Window {
         //The operation was canceled by the user.
-        const int ERROR_CANCELLED = 1223;
+        private const int ERROR_CANCELLED = 1223;
 
-        public MainWindow()
-        {
+        private DataStore data = new DataStore();
+
+        public MainWindow() {
             InitializeComponent();
         }
 
-        private void exitButton_Click(object sender, RoutedEventArgs e)
-        {
+        private void mainWindow_Loaded(object sender, RoutedEventArgs e) {
+            JsonStorage.fileName = System.IO.Path.Combine(GetFolderPath(SpecialFolder.UserProfile), "thnolgdb.json");
+            JsonStorage.loadJson(data);
+            gameList.ItemsSource = data.games;
+            serverList.ItemsSource = data.servers;
+        }
+
+        private void exitButton_Click(object sender, RoutedEventArgs e) {
             Application.Current.Shutdown();
         }
 
-        private void mainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            Game cod4Game = new Game();
-            cod4Game.name = "Call of Duty 4";
-            cod4Game.tag = "cod4";
-            cod4Game.executable = @"C:\Program Files (x86)\Call of Duty 4\iw3mp.exe";
-            cod4Game.runAsAdmin = false;
-
-            Game cod2Game = new Game();
-            cod2Game.name = "Call of Duty 2";
-            cod2Game.tag = "cod2";
-            cod2Game.executable = @"C:\Program Files (x86)\Call of Duty 2\cod2mp_s.exe";
-            cod2Game.runAsAdmin = true;
-
-            Server hellnetCod4Server = new Server();
-            hellnetCod4Server.name = "The HellNet.org CoD4 Server";
-            hellnetCod4Server.game = cod4Game;
-            hellnetCod4Server.address = "cod4.thehellnet.org";
-            hellnetCod4Server.port = 28964;
-
-            Server hellnetCod2Server = new Server();
-            hellnetCod2Server.name = "The HellNet.org CoD2 Server";
-            hellnetCod2Server.game = cod2Game;
-            hellnetCod2Server.address = "cod2.thehellnet.org";
-            hellnetCod2Server.port = 28960;
-
-            mainWindow.listView.Items.Add(hellnetCod4Server);
-            mainWindow.listView.Items.Add(hellnetCod2Server);
+        private void launchButtonUpdate() {
+            launchButton.IsEnabled =
+                tabControl.SelectedItem.Equals(serverTab)
+                && mainWindow.serverList.SelectedItem != null;
         }
 
-        private void listView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            mainWindow.launchButton.IsEnabled =
-                mainWindow.listView.SelectedItem != null;
+        private void updateSaveButtonEnable() {
+            saveButton.IsEnabled = JsonStorage.isDirty(data);
         }
 
-        private void launchButton_Click(object sender, RoutedEventArgs e)
-        {
-            Server server = (Server) mainWindow.listView.SelectedItem;
-            Game game = server.game;
+        private void serverList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            launchButtonUpdate();
+        }
+
+        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            launchButtonUpdate();
+        }
+
+        private void launchButton_Click(object sender, RoutedEventArgs e) {
+            Server server = (Server) mainWindow.serverList.SelectedItem;
+            Game game = data.games.Find(item => item.tag == server.gameTag);
 
             String arguments = " +connect " + server.address + ":" + server.port;
             String workingDirectory = new FileInfo(game.executable).Directory.FullName;
@@ -86,15 +73,28 @@ namespace ThnOlgLauncher
             process.WorkingDirectory = workingDirectory;
             process.Arguments = arguments;
             process.UseShellExecute = true;
-            if (game.tag.Equals("cod2")) {
+            if(game.runAsAdmin == true) {
                 process.Verb = "runas";
             }
 
             try {
                 Process.Start(process);
-            } catch (Exception ex) {
+            } catch(Exception ex) {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void gameList_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e) {
+            updateSaveButtonEnable();
+        }
+
+        private void serverList_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e) {
+            updateSaveButtonEnable();
+        }
+
+        private void saveButton_Click(object sender, RoutedEventArgs e) {
+            JsonStorage.saveJson(data);
+            updateSaveButtonEnable();
         }
     }
 }
