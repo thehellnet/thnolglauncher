@@ -22,11 +22,22 @@
             </TabItem>
             <TabItem x:Name="gameTab" Header="Games">
                 <Grid Background="White">
+                    <Grid.Resources>
+                        <DataTemplate x:Key="FilePathTemplate" >
+                            <Grid>
+                                <TextBlock Text="{Binding executable}" Width="auto" Margin="0,0,22,0"  HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0"/>
+                                <Button Content="..." Height="16" Width="20" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="1" Click="gameExecutableButton_Click"/>
+                            </Grid>
+                        </DataTemplate>
+                        <DataTemplate x:Key="FilePathTemplateEditing">
+                            <TextBlock Text="{Binding executable}" />
+                        </DataTemplate>
+                    </Grid.Resources>
                     <DataGrid x:Name="gameList" Margin="10" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="gameList_CellEditEnding" EnableRowVirtualization="False" KeyDown="gameList_KeyDown">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding name}"/>
                             <DataGridTextColumn Header="Tag" Width="Auto" Binding="{Binding tag}"/>
-                            <DataGridTextColumn Header="Executable" Width="Auto" Binding="{Binding executable}"/>
+                            <DataGridTemplateColumn Header="Executable" Width="Auto" CellTemplate="{StaticResource FilePathTemplate}" CellEditingTemplate="{StaticResource FilePathTemplate}"/>
                             <DataGridCheckBoxColumn Header="Run as Admin" Width="Auto" Binding="{Binding runAsAdmin}"/>
                         </DataGrid.Columns>
                     </DataGrid>

@@ -116,5 +116,27 @@ namespace ThnOlgLauncher {
         private void gameList_KeyDown(object sender, KeyEventArgs e) {
             updateSaveButtonEnable();
         }
+
+        private void gameExecutableButton_Click(object sender, RoutedEventArgs e) {
+            System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
+            dialog.Filter = "Executables (*.exe)|*.exe";
+            dialog.FilterIndex = 1;
+            dialog.Multiselect = false;
+            dialog.ShowDialog();
+            String fileName = dialog.FileName;
+
+            Game game = (Game) mainWindow.gameList.SelectedItem;
+            game.executable = fileName;
+
+            Button button = (Button) sender;
+            System.Windows.Controls.Grid grid = (System.Windows.Controls.Grid) button.Parent;
+            TextBlock textBlock = grid.Children.OfType<TextBlock>().First();
+            textBlock.Text = fileName;
+
+            e.Handled = true;
+
+            Console.WriteLine(data.games.ElementAt(3).executable);
+            updateSaveButtonEnable();
+        }
     }
 }
