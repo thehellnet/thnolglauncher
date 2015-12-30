@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ThnOlgLauncher"
         mc:Ignorable="d"
-        Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded">
+        Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded" Icon="ic_launcher.ico">
     <Grid>
         <TabControl x:Name="tabControl" Margin="10,10,10,37" SelectionChanged="tabControl_SelectionChanged">
             <TabItem x:Name="serverTab" Header="Servers">
                 <Grid Background="White">
-                    <DataGrid x:Name="serverList" Margin="10" SelectionChanged="serverList_SelectionChanged" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverList_CellEditEnding" EnableRowVirtualization="False">
+                    <DataGrid x:Name="serverList" Margin="10" SelectionChanged="serverList_SelectionChanged" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverList_CellEditEnding" EnableRowVirtualization="False" KeyDown="serverList_KeyDown">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Description" Width="Auto" Binding="{Binding name}"/>
                             <DataGridTextColumn Header="Game" Width="Auto" Binding="{Binding gameTag}"/>
@@ -22,7 +22,7 @@
             </TabItem>
             <TabItem x:Name="gameTab" Header="Games">
                 <Grid Background="White">
-                    <DataGrid x:Name="gameList" Margin="10" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="gameList_CellEditEnding" EnableRowVirtualization="False">
+                    <DataGrid x:Name="gameList" Margin="10" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="gameList_CellEditEnding" EnableRowVirtualization="False" KeyDown="gameList_KeyDown">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding name}"/>
                             <DataGridTextColumn Header="Tag" Width="Auto" Binding="{Binding tag}"/>

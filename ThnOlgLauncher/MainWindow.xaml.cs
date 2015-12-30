@@ -17,6 +17,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ThnOlgLauncher.controller;
 using ThnOlgLauncher.model;
+
+using System.Windows.Forms.DataVisualization.Charting;
+
 using static System.Environment;
 
 namespace ThnOlgLauncher {
@@ -28,41 +31,13 @@ namespace ThnOlgLauncher {
         private const int ERROR_CANCELLED = 1223;
 
         private DataStore data = new DataStore();
+        private JsonStorage jsonStorage = new JsonStorage();
 
         public MainWindow() {
             InitializeComponent();
         }
 
-        private void mainWindow_Loaded(object sender, RoutedEventArgs e) {
-            JsonStorage.fileName = System.IO.Path.Combine(GetFolderPath(SpecialFolder.UserProfile), "thnolgdb.json");
-            JsonStorage.loadJson(data);
-            gameList.ItemsSource = data.games;
-            serverList.ItemsSource = data.servers;
-        }
-
-        private void exitButton_Click(object sender, RoutedEventArgs e) {
-            Application.Current.Shutdown();
-        }
-
-        private void launchButtonUpdate() {
-            launchButton.IsEnabled =
-                tabControl.SelectedItem.Equals(serverTab)
-                && mainWindow.serverList.SelectedItem != null;
-        }
-
-        private void updateSaveButtonEnable() {
-            saveButton.IsEnabled = JsonStorage.isDirty(data);
-        }
-
-        private void serverList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            launchButtonUpdate();
-        }
-
-        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            launchButtonUpdate();
-        }
-
-        private void launchButton_Click(object sender, RoutedEventArgs e) {
+        private void launchGame() {
             Server server = (Server) mainWindow.serverList.SelectedItem;
             Game game = data.games.Find(item => item.tag == server.gameTag);
 
@@ -84,6 +59,38 @@ namespace ThnOlgLauncher {
             }
         }
 
+        private void mainWindow_Loaded(object sender, RoutedEventArgs e) {
+            jsonStorage.loadJson(data);
+            gameList.ItemsSource = data.games;
+            serverList.ItemsSource = data.servers;
+        }
+
+        private void exitButton_Click(object sender, RoutedEventArgs e) {
+            Application.Current.Shutdown();
+        }
+
+        private void launchButtonUpdate() {
+            launchButton.IsEnabled =
+                tabControl.SelectedItem.Equals(serverTab)
+                && mainWindow.serverList.SelectedItem != null;
+        }
+
+        private void updateSaveButtonEnable() {
+            saveButton.IsEnabled = jsonStorage.isDirty(data);
+        }
+
+        private void serverList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            launchButtonUpdate();
+        }
+
+        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            launchButtonUpdate();
+        }
+
+        private void launchButton_Click(object sender, RoutedEventArgs e) {
+            launchGame();
+        }
+
         private void gameList_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e) {
             updateSaveButtonEnable();
         }
@@ -93,7 +100,20 @@ namespace ThnOlgLauncher {
         }
 
         private void saveButton_Click(object sender, RoutedEventArgs e) {
-            JsonStorage.saveJson(data);
+            try {
+                jsonStorage.saveJson(data);
+            } catch(System.UnauthorizedAccessException ex) {
+                MessageBox.Show(ex.Message);
+            }
+
+            updateSaveButtonEnable();
+        }
+
+        private void serverList_KeyDown(object sender, KeyEventArgs e) {
+            updateSaveButtonEnable();
+        }
+
+        private void gameList_KeyDown(object sender, KeyEventArgs e) {
             updateSaveButtonEnable();
         }
     }
