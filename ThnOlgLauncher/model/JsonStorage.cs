@@ -14,8 +14,8 @@ namespace ThnOlgLauncher.controller {
         public String fileNameServers { get; set; }
 
         public JsonStorage() {
-            fileNameGames = DEFAULT_FILENAME_SERVERS;
-            fileNameServers = DEFAULT_FILENAME_GAMES;
+            fileNameGames = DEFAULT_FILENAME_GAMES;
+            fileNameServers = DEFAULT_FILENAME_SERVERS;
         }
 
         private String readJsonGames() {

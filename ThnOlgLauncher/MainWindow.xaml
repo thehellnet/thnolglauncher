@@ -10,10 +10,18 @@
         <TabControl x:Name="tabControl" Margin="10,10,10,37" SelectionChanged="tabControl_SelectionChanged">
             <TabItem x:Name="serverTab" Header="Servers">
                 <Grid Background="White">
-                    <DataGrid x:Name="serverList" Margin="10" SelectionChanged="serverList_SelectionChanged" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverList_CellEditEnding" EnableRowVirtualization="False" KeyDown="serverList_KeyDown">
+                    <Grid.Resources>
+                        <DataTemplate x:Key="GameSelectTemplate" >
+                            <TextBlock Text="{Binding gameTag}"/>
+                        </DataTemplate>
+                        <DataTemplate x:Key="GameSelectTemplateEditing" >
+                            <ComboBox Text="{Binding gameTag}" Height="16" Initialized="ComboBox_Initialized" SelectionChanged="ComboBox_SelectionChanged" />
+                        </DataTemplate>
+                    </Grid.Resources>
+                    <DataGrid x:Name="serverList" Margin="10" SelectionChanged="serverList_SelectionChanged" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverList_CellEditEnding" EnableRowVirtualization="False" KeyDown="serverList_KeyDown" CurrentCellChanged="serverList_CurrentCellChanged">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Description" Width="Auto" Binding="{Binding name}"/>
-                            <DataGridTextColumn Header="Game" Width="Auto" Binding="{Binding gameTag}"/>
+                            <DataGridTemplateColumn Header="Game" Width="Auto" CellTemplate="{StaticResource GameSelectTemplate}" CellEditingTemplate="{StaticResource GameSelectTemplateEditing}" />
                             <DataGridTextColumn Header="Address" Width="Auto" Binding="{Binding address}"/>
                             <DataGridTextColumn Header="Port" Width="Auto" Binding="{Binding port}"/>
                         </DataGrid.Columns>
@@ -29,11 +37,8 @@
                                 <Button Content="..." Height="16" Width="20" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="1" Click="gameExecutableButton_Click"/>
                             </Grid>
                         </DataTemplate>
-                        <DataTemplate x:Key="FilePathTemplateEditing">
-                            <TextBlock Text="{Binding executable}" />
-                        </DataTemplate>
                     </Grid.Resources>
-                    <DataGrid x:Name="gameList" Margin="10" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="gameList_CellEditEnding" EnableRowVirtualization="False" KeyDown="gameList_KeyDown">
+                    <DataGrid x:Name="gameList" Margin="10" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="gameList_CellEditEnding" EnableRowVirtualization="False" KeyDown="gameList_KeyDown" CurrentCellChanged="gameList_CurrentCellChanged">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding name}"/>
                             <DataGridTextColumn Header="Tag" Width="Auto" Binding="{Binding tag}"/>
@@ -41,6 +46,12 @@
                             <DataGridCheckBoxColumn Header="Run as Admin" Width="Auto" Binding="{Binding runAsAdmin}"/>
                         </DataGrid.Columns>
                     </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="infosTab" Header="Infos">
+                <Grid Background="#FFE5E5E5">
+                    <TextBlock x:Name="linkText" Margin="10,0,0,10" TextWrapping="Wrap" Text="http://www.thehellnet.org" Foreground="Blue" MouseLeftButtonDown="linkText_MouseLeftButtonDown" HorizontalAlignment="Left" Width="137" Height="16" VerticalAlignment="Bottom"/>
+                    <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,0,0,26" TextWrapping="Wrap" Text="The HellNet.org On-Line Games Launcher" Height="16" VerticalAlignment="Bottom"/>
                 </Grid>
             </TabItem>
         </TabControl>

@@ -40,6 +40,10 @@ namespace ThnOlgLauncher {
         private void launchGame() {
             Server server = (Server) mainWindow.serverList.SelectedItem;
             Game game = data.games.Find(item => item.tag == server.gameTag);
+            if(game == null) {
+                MessageBox.Show("Game not found!\nPlease add a game in Games tab and assign it to this server", "ERROR");
+                return;
+            }
 
             String arguments = " +connect " + server.address + ":" + server.port;
             String workingDirectory = new FileInfo(game.executable).Directory.FullName;
@@ -117,6 +121,18 @@ namespace ThnOlgLauncher {
             updateSaveButtonEnable();
         }
 
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            updateSaveButtonEnable();
+        }
+
+        private void serverList_CurrentCellChanged(object sender, EventArgs e) {
+            updateSaveButtonEnable();
+        }
+
+        private void gameList_CurrentCellChanged(object sender, EventArgs e) {
+            updateSaveButtonEnable();
+        }
+
         private void gameExecutableButton_Click(object sender, RoutedEventArgs e) {
             System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
             dialog.Filter = "Executables (*.exe)|*.exe";
@@ -125,15 +141,31 @@ namespace ThnOlgLauncher {
             dialog.ShowDialog();
             String fileName = dialog.FileName;
 
-            Game game = (Game) mainWindow.gameList.SelectedItem;
+            Game game = (Game) gameList.SelectedItem;
             game.executable = fileName;
             Button button = (Button) sender;
             System.Windows.Controls.Grid grid = (System.Windows.Controls.Grid) button.Parent;
             TextBlock textBlock = grid.Children.OfType<TextBlock>().First();
             textBlock.Text = fileName;
             updateSaveButtonEnable();
+        }
 
-            e.Handled = true;
+        private void linkText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+            Process myProcess = new Process();
+
+            try {
+                // true is the default, but it is important not to set it to false
+                myProcess.StartInfo.UseShellExecute = true;
+                myProcess.StartInfo.FileName = "http://www.thehellnet.org/";
+                myProcess.Start();
+            } catch(Exception ex) {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void ComboBox_Initialized(object sender, EventArgs e) {
+            ComboBox comboBox = (ComboBox) sender;
+            data.games.ForEach(game => comboBox.Items.Add(game.tag));
         }
     }
 }
