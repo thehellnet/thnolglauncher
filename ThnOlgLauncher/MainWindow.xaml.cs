@@ -127,16 +127,13 @@ namespace ThnOlgLauncher {
 
             Game game = (Game) mainWindow.gameList.SelectedItem;
             game.executable = fileName;
-
             Button button = (Button) sender;
             System.Windows.Controls.Grid grid = (System.Windows.Controls.Grid) button.Parent;
             TextBlock textBlock = grid.Children.OfType<TextBlock>().First();
             textBlock.Text = fileName;
+            updateSaveButtonEnable();
 
             e.Handled = true;
-
-            Console.WriteLine(data.games.ElementAt(3).executable);
-            updateSaveButtonEnable();
         }
     }
 }
