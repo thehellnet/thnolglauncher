@@ -37,7 +37,7 @@ namespace ThnOlgLauncher {
             InitializeComponent();
         }
 
-        private void launchGame() {
+        private void launchServer() {
             Server server = (Server) mainWindow.serverList.SelectedItem;
             Game game = data.games.Find(item => item.tag == server.gameTag);
             if(game == null) {
@@ -63,74 +63,78 @@ namespace ThnOlgLauncher {
             }
         }
 
+        private void launchGame() {
+            Server server = (Server) mainWindow.serverList.SelectedItem;
+            Game game = (Game) gameList.SelectedItem;
+            if(game == null) {
+                MessageBox.Show("Game not found!\nPlease add a game in Games tab and assign it to this server", "ERROR");
+                return;
+            }
+
+            String workingDirectory = new FileInfo(game.executable).Directory.FullName;
+
+            ProcessStartInfo process = new ProcessStartInfo(game.executable);
+            process.WorkingDirectory = workingDirectory;
+            process.UseShellExecute = true;
+            if(game.runAsAdmin == true) {
+                process.Verb = "runas";
+            }
+
+            try {
+                Process.Start(process);
+            } catch(Exception ex) {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void linkOpen(String url) {
+            Process myProcess = new Process();
+
+            try {
+                // true is the default, but it is important not to set it to false
+                myProcess.StartInfo.UseShellExecute = true;
+                myProcess.StartInfo.FileName = url;
+                myProcess.Start();
+            } catch(Exception ex) {
+                Console.WriteLine(ex.Message);
+            }
+        }
         private void mainWindow_Loaded(object sender, RoutedEventArgs e) {
             jsonStorage.loadJson(data);
             gameList.ItemsSource = data.games;
             serverList.ItemsSource = data.servers;
+
+            setPingElementsEnable(false);
         }
 
         private void exitButton_Click(object sender, RoutedEventArgs e) {
             Application.Current.Shutdown();
         }
 
-        private void launchButtonUpdate() {
-            launchButton.IsEnabled =
-                tabControl.SelectedItem.Equals(serverTab)
-                && mainWindow.serverList.SelectedItem != null;
+        private void serverListUpdate(object sender, EventArgs e) {
+            serverSaveButtonUpdateEnable();
+            serverLaunchButtonUpdateEnable();
         }
 
-        private void updateSaveButtonEnable() {
-            saveButton.IsEnabled = jsonStorage.isDirty(data);
+        private void gameListUpdate(object sender, EventArgs e) {
+            gameSaveButtonUpdateEnable();
+            gameLaunchButtonUpdateEnable();
         }
 
-        private void serverList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            launchButtonUpdate();
+        private void serverLaunchButtonUpdateEnable() {
+            serverLaunchButton.IsEnabled = serverList.SelectedItem != null;
         }
 
-        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            launchButtonUpdate();
+        private void serverSaveButtonUpdateEnable() {
+            serverSaveButton.IsEnabled = jsonStorage.isDirtyServer(data);
         }
 
-        private void launchButton_Click(object sender, RoutedEventArgs e) {
-            launchGame();
+        private void gameLaunchButtonUpdateEnable() {
+            gameLaunchButton.IsEnabled = gameList.SelectedItem != null;
         }
 
-        private void gameList_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e) {
-            updateSaveButtonEnable();
-        }
-
-        private void serverList_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e) {
-            updateSaveButtonEnable();
-        }
-
-        private void saveButton_Click(object sender, RoutedEventArgs e) {
-            try {
-                jsonStorage.saveJson(data);
-            } catch(System.UnauthorizedAccessException ex) {
-                MessageBox.Show(ex.Message);
-            }
-
-            updateSaveButtonEnable();
-        }
-
-        private void serverList_KeyDown(object sender, KeyEventArgs e) {
-            updateSaveButtonEnable();
-        }
-
-        private void gameList_KeyDown(object sender, KeyEventArgs e) {
-            updateSaveButtonEnable();
-        }
-
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            updateSaveButtonEnable();
-        }
-
-        private void serverList_CurrentCellChanged(object sender, EventArgs e) {
-            updateSaveButtonEnable();
-        }
-
-        private void gameList_CurrentCellChanged(object sender, EventArgs e) {
-            updateSaveButtonEnable();
+        private void gameSaveButtonUpdateEnable() {
+            gameSaveButton.IsEnabled = jsonStorage.isDirtyGame(data);
         }
 
         private void gameExecutableButton_Click(object sender, RoutedEventArgs e) {
@@ -147,25 +151,46 @@ namespace ThnOlgLauncher {
             System.Windows.Controls.Grid grid = (System.Windows.Controls.Grid) button.Parent;
             TextBlock textBlock = grid.Children.OfType<TextBlock>().First();
             textBlock.Text = fileName;
-            updateSaveButtonEnable();
+            serverSaveButtonUpdateEnable();
         }
 
         private void linkText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
-            Process myProcess = new Process();
-
-            try {
-                // true is the default, but it is important not to set it to false
-                myProcess.StartInfo.UseShellExecute = true;
-                myProcess.StartInfo.FileName = "http://www.thehellnet.org/";
-                myProcess.Start();
-            } catch(Exception ex) {
-                Console.WriteLine(ex.Message);
-            }
+            linkOpen("http://www.thehellnet.org/");
         }
 
         private void ComboBox_Initialized(object sender, EventArgs e) {
             ComboBox comboBox = (ComboBox) sender;
             data.games.ForEach(game => comboBox.Items.Add(game.tag));
+        }
+
+        private void setPingElementsEnable(bool status) {
+            if(status) {
+                pingAddressPortText.IsEnabled = false;
+                pingStartButton.IsEnabled = false;
+                pingStopButton.IsEnabled = true;
+            } else {
+                pingAddressPortText.IsEnabled = true;
+                pingStartButton.IsEnabled = true;
+                pingStopButton.IsEnabled = false;
+            }
+        }
+
+        private void serverLaunchButton_Click(object sender, RoutedEventArgs e) {
+            launchServer();
+        }
+
+        private void gameLaunchButton_Click(object sender, RoutedEventArgs e) {
+            launchGame();
+        }
+
+        private void serverSaveButton_Click(object sender, RoutedEventArgs e) {
+            jsonStorage.saveJsonServers(data);
+            serverSaveButtonUpdateEnable();
+        }
+
+        private void gameSaveButton_Click(object sender, RoutedEventArgs e) {
+            jsonStorage.saveJsonGames(data);
+            gameSaveButtonUpdateEnable();
         }
     }
 }

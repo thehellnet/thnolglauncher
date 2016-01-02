@@ -66,7 +66,7 @@ namespace ThnOlgLauncher.controller {
             }
         }
 
-        private void saveJsonGames(DataStore data) {
+        public void saveJsonGames(DataStore data) {
             String jsonString = serializer.Serialize(data.games);
             if(jsonString.Equals(readJsonGames())) {
                 Console.WriteLine("Equals... Not writing...");
@@ -76,7 +76,7 @@ namespace ThnOlgLauncher.controller {
             Console.WriteLine("Updating Games JSON...");
         }
 
-        private void saveJsonServers(DataStore data) {
+        public void saveJsonServers(DataStore data) {
             String jsonString = serializer.Serialize(data.servers);
             if(jsonString.Equals(readJsonServers())) {
                 Console.WriteLine("Equals... Not writing...");
@@ -96,9 +96,12 @@ namespace ThnOlgLauncher.controller {
             saveJsonServers(data);
         }
 
-        public bool isDirty(DataStore data) {
-            return (readJsonGames() != serializer.Serialize(data.games))
-                || (readJsonServers() != serializer.Serialize(data.servers));
+        public bool isDirtyGame(DataStore data) {
+            return readJsonGames() != serializer.Serialize(data.games);
+        }
+
+        public bool isDirtyServer(DataStore data) {
+            return readJsonServers() != serializer.Serialize(data.servers);
         }
     }
 }

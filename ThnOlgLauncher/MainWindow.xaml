@@ -7,18 +7,18 @@
         mc:Ignorable="d"
         Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded" Icon="ic_launcher.ico">
     <Grid>
-        <TabControl x:Name="tabControl" Margin="10,10,10,37" SelectionChanged="tabControl_SelectionChanged">
-            <TabItem x:Name="serverTab" Header="Servers">
+        <TabControl x:Name="tabControl" Margin="10,10,10,37" TabStripPlacement="Left">
+            <TabItem x:Name="serverTab" Header="Servers" Margin="0,0,-2,-4">
                 <Grid Background="White">
                     <Grid.Resources>
                         <DataTemplate x:Key="GameSelectTemplate" >
                             <TextBlock Text="{Binding gameTag}"/>
                         </DataTemplate>
                         <DataTemplate x:Key="GameSelectTemplateEditing" >
-                            <ComboBox Text="{Binding gameTag}" Height="16" Initialized="ComboBox_Initialized" SelectionChanged="ComboBox_SelectionChanged" />
+                            <ComboBox Text="{Binding gameTag}" Height="16" Initialized="ComboBox_Initialized"/>
                         </DataTemplate>
                     </Grid.Resources>
-                    <DataGrid x:Name="serverList" Margin="10" SelectionChanged="serverList_SelectionChanged" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverList_CellEditEnding" EnableRowVirtualization="False" KeyDown="serverList_KeyDown" CurrentCellChanged="serverList_CurrentCellChanged">
+                    <DataGrid x:Name="serverList" Margin="10,10,10,37" SelectionChanged="serverListUpdate" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverListUpdate" EnableRowVirtualization="False" KeyDown="serverListUpdate" CurrentCellChanged="serverListUpdate">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Description" Width="Auto" Binding="{Binding name}"/>
                             <DataGridTemplateColumn Header="Game" Width="Auto" CellTemplate="{StaticResource GameSelectTemplate}" CellEditingTemplate="{StaticResource GameSelectTemplateEditing}" />
@@ -26,6 +26,8 @@
                             <DataGridTextColumn Header="Port" Width="Auto" Binding="{Binding port}"/>
                         </DataGrid.Columns>
                     </DataGrid>
+                    <Button x:Name="serverLaunchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="serverLaunchButton_Click"/>
+                    <Button x:Name="serverSaveButton" Content="Save" HorizontalAlignment="Left" Margin="10,0,0,10" Width="100" Click="serverSaveButton_Click" IsEnabled="False" Height="22" VerticalAlignment="Bottom"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="gameTab" Header="Games">
@@ -38,7 +40,7 @@
                             </Grid>
                         </DataTemplate>
                     </Grid.Resources>
-                    <DataGrid x:Name="gameList" Margin="10" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="gameList_CellEditEnding" EnableRowVirtualization="False" KeyDown="gameList_KeyDown" CurrentCellChanged="gameList_CurrentCellChanged">
+                    <DataGrid x:Name="gameList" Margin="10,10,10,37" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="gameListUpdate" EnableRowVirtualization="False" KeyDown="gameListUpdate" CurrentCellChanged="gameListUpdate" SelectionChanged="gameListUpdate">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding name}"/>
                             <DataGridTextColumn Header="Tag" Width="Auto" Binding="{Binding tag}"/>
@@ -46,17 +48,29 @@
                             <DataGridCheckBoxColumn Header="Run as Admin" Width="Auto" Binding="{Binding runAsAdmin}"/>
                         </DataGrid.Columns>
                     </DataGrid>
+                    <Button x:Name="gameLaunchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="gameLaunchButton_Click"/>
+                    <Button x:Name="gameSaveButton" Content="Save" HorizontalAlignment="Left" Margin="10,0,0,10" Width="100" Click="gameSaveButton_Click" IsEnabled="False" Height="22" VerticalAlignment="Bottom"/>
                 </Grid>
             </TabItem>
-            <TabItem x:Name="infosTab" Header="Infos">
+            <TabItem x:Name="infosTab" Header="Ping test">
+                <Grid Background="#FFE5E5E5">
+                    <Border BorderBrush="Black" BorderThickness="1" Height="100" Margin="10,10,10,0" VerticalAlignment="Top"/>
+                    <Button x:Name="pingStartButton" Content="Start ping" Margin="0,115,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75" Height="26"/>
+                    <Button x:Name="pingStopButton" Content="Stop ping" Margin="0,115,90,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75" Height="26"/>
+                    <TextBox x:Name="pingAddressPortText" Height="26" Margin="143,115,170,0" TextWrapping="Wrap" Text="caronte.thehellnet.org:64285" VerticalAlignment="Top" />
+                    <Label x:Name="pingAddressPortLabel" Content="Address and UDP port" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Demo player">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+            <TabItem Header="About...">
                 <Grid Background="#FFE5E5E5">
                     <TextBlock x:Name="linkText" Margin="10,0,0,10" TextWrapping="Wrap" Text="http://www.thehellnet.org" Foreground="Blue" MouseLeftButtonDown="linkText_MouseLeftButtonDown" HorizontalAlignment="Left" Width="137" Height="16" VerticalAlignment="Bottom"/>
-                    <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,0,0,26" TextWrapping="Wrap" Text="The HellNet.org On-Line Games Launcher" Height="16" VerticalAlignment="Bottom"/>
+                    <TextBlock x:Name="descriptionText" HorizontalAlignment="Left" Margin="10,0,0,26" TextWrapping="Wrap" Text="The HellNet.org On-Line Games Launcher" Height="16" VerticalAlignment="Bottom"/>
                 </Grid>
             </TabItem>
         </TabControl>
         <Button x:Name="exitButton" Content="Exit" Margin="10,0,0,10" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Bottom" Click="exitButton_Click" Grid.Row="1"/>
-        <Button x:Name="launchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="launchButton_Click" Grid.Row="1"/>
-        <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="115,0,0,10" Width="100" Click="saveButton_Click" IsEnabled="False" Height="22" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

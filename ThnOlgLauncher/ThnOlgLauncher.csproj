@@ -103,6 +103,7 @@
     <Compile Include="model\Game.cs" />
     <Compile Include="model\DataStore.cs" />
     <Compile Include="model\Server.cs" />
+    <Compile Include="pinger\Pinger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
