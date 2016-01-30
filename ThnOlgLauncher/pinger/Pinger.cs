@@ -1,33 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using ThnOlgLauncher.model;
 
 namespace ThnOlgLauncher.pinger {
     class Pinger {
+        public static int pingServer(Server server) {
+            UdpClient sck = new UdpClient();
+            sck.Client.ReceiveTimeout = 500;
+            sck.Connect(server.address, server.port);
 
-        public String address { get; set; }
-        public int port { get; set; }
+            Byte[] sendBytes = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x67, 0x65, 0x74, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x0A };
 
-        private UdpClient sck = new UdpClient();
+            DateTime timeStart = DateTime.Now;
+            sck.Send(sendBytes, sendBytes.Length);
 
-        public void setAddressPort(String text) {
-            String[] elems = text.Trim().Split(',');
-            if(elems.Count() != 2) {
-                return;
+            IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            byte[] recvData;
+            try {
+                recvData = sck.Receive(ref RemoteIpEndPoint);
+            } catch(Exception e) {
+                Console.WriteLine(e.StackTrace);
+                return 0;
             }
-            address = elems[0];
-            port = Int16.Parse(elems[1]);
-        }
 
-        public void start() {
-            sck.Connect(address, port);
-        }
+            DateTime timeStop = DateTime.Now;
+            string returnData = Encoding.ASCII.GetString(recvData);
+            sck.Close();
 
-        public void stop() {
-
+            TimeSpan timeSpan = timeStop - timeStart;
+            return (int) timeSpan.TotalMilliseconds;
         }
     }
 }

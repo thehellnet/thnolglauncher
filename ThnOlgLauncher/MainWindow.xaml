@@ -7,15 +7,15 @@
         mc:Ignorable="d"
         Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded" Icon="ic_launcher.ico">
     <Grid>
-        <TabControl x:Name="tabControl" Margin="10,10,10,37" TabStripPlacement="Left">
-            <TabItem x:Name="serverTab" Header="Servers" Margin="0,0,-2,-4">
+        <TabControl x:Name="tabControl" Margin="10,10,10,37" TabStripPlacement="Left" SelectionChanged="tabControl_SelectionChanged">
+            <TabItem x:Name="serverTab" Header="Servers">
                 <Grid Background="White">
                     <Grid.Resources>
                         <DataTemplate x:Key="GameSelectTemplate" >
                             <TextBlock Text="{Binding gameTag}"/>
                         </DataTemplate>
                         <DataTemplate x:Key="GameSelectTemplateEditing" >
-                            <ComboBox Text="{Binding gameTag}" Height="16" Initialized="ComboBox_Initialized"/>
+                            <ComboBox Text="{Binding gameTag}" Height="16" Initialized="GameSelectComboBox_Initialized"/>
                         </DataTemplate>
                     </Grid.Resources>
                     <DataGrid x:Name="serverList" Margin="10,10,10,37" SelectionChanged="serverListUpdate" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverListUpdate" EnableRowVirtualization="False" KeyDown="serverListUpdate" CurrentCellChanged="serverListUpdate">
@@ -24,10 +24,12 @@
                             <DataGridTemplateColumn Header="Game" Width="Auto" CellTemplate="{StaticResource GameSelectTemplate}" CellEditingTemplate="{StaticResource GameSelectTemplateEditing}" />
                             <DataGridTextColumn Header="Address" Width="Auto" Binding="{Binding address}"/>
                             <DataGridTextColumn Header="Port" Width="Auto" Binding="{Binding port}"/>
+                            <DataGridTextColumn Header="Ping" Width="Auto" IsReadOnly="True" Binding="{Binding ping}" />
                         </DataGrid.Columns>
                     </DataGrid>
                     <Button x:Name="serverLaunchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="serverLaunchButton_Click"/>
                     <Button x:Name="serverSaveButton" Content="Save" HorizontalAlignment="Left" Margin="10,0,0,10" Width="100" Click="serverSaveButton_Click" IsEnabled="False" Height="22" VerticalAlignment="Bottom"/>
+                    <Button x:Name="updatePingButton" Content="Update Ping" HorizontalAlignment="Right" Margin="0,0,115,10" Width="100" Height="22" VerticalAlignment="Bottom" Click="updatePingButton_Click"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="gameTab" Header="Games">
@@ -52,7 +54,7 @@
                     <Button x:Name="gameSaveButton" Content="Save" HorizontalAlignment="Left" Margin="10,0,0,10" Width="100" Click="gameSaveButton_Click" IsEnabled="False" Height="22" VerticalAlignment="Bottom"/>
                 </Grid>
             </TabItem>
-            <TabItem x:Name="infosTab" Header="Ping test">
+            <TabItem x:Name="pingTab" Header="Ping test">
                 <Grid Background="#FFE5E5E5">
                     <Border BorderBrush="Black" BorderThickness="1" Height="100" Margin="10,10,10,0" VerticalAlignment="Top"/>
                     <Button x:Name="pingStartButton" Content="Start ping" Margin="0,115,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75" Height="26"/>
@@ -61,10 +63,17 @@
                     <Label x:Name="pingAddressPortLabel" Content="Address and UDP port" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Demo player">
-                <Grid Background="#FFE5E5E5"/>
+            <TabItem x:Name="demoTab" Header="Demo player">
+                <Grid Background="#FFE5E5E5">
+                    <Label x:Name="demoFileLabel" Content="Choose DEMO file" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="demoFileText" Height="26" Margin="121,10,35,0" MaxLines="1" IsReadOnly="True" TextWrapping="NoWrap" VerticalAlignment="Top"/>
+                    <Button x:Name="demoFileButton" Content="..." Margin="0,10,10,0" VerticalAlignment="Top" Height="26" HorizontalAlignment="Right" Width="20" Click="demoFileButton_Click"/>
+                    <Label x:Name="demoGameLabel" Content="Choose game" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="demoGameCombo" Margin="121,41,115,0" VerticalAlignment="Top" Height="26" IsReadOnly="True" IsSynchronizedWithCurrentItem="True"/>
+                    <Button x:Name="demoLaunchButton" Content="Launch DEMO" Margin="0,41,10,0" VerticalAlignment="Top" Height="26" HorizontalAlignment="Right" Width="100" Click="demoLaunchButton_Click"/>
+                </Grid>
             </TabItem>
-            <TabItem Header="About...">
+            <TabItem x:Name="aboutTab" Header="About...">
                 <Grid Background="#FFE5E5E5">
                     <TextBlock x:Name="linkText" Margin="10,0,0,10" TextWrapping="Wrap" Text="http://www.thehellnet.org" Foreground="Blue" MouseLeftButtonDown="linkText_MouseLeftButtonDown" HorizontalAlignment="Left" Width="137" Height="16" VerticalAlignment="Bottom"/>
                     <TextBlock x:Name="descriptionText" HorizontalAlignment="Left" Margin="10,0,0,26" TextWrapping="Wrap" Text="The HellNet.org On-Line Games Launcher" Height="16" VerticalAlignment="Bottom"/>

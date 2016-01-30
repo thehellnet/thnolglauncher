@@ -21,6 +21,7 @@ using ThnOlgLauncher.model;
 using System.Windows.Forms.DataVisualization.Charting;
 
 using static System.Environment;
+using ThnOlgLauncher.pinger;
 
 namespace ThnOlgLauncher {
     /// <summary>
@@ -87,6 +88,31 @@ namespace ThnOlgLauncher {
             }
         }
 
+        private void launchDemo() {
+            Game game = data.games.Find(item => item.tag == demoGameCombo.Text);
+            if(game == null) {
+                MessageBox.Show("Game not found!\nPlease add a game in Games tab", "ERROR");
+                return;
+            }
+
+            String arguments = " +demo " + demoFileText.Text;
+            String workingDirectory = new FileInfo(game.executable).Directory.FullName;
+
+            ProcessStartInfo process = new ProcessStartInfo(game.executable);
+            process.WorkingDirectory = workingDirectory;
+            process.Arguments = arguments;
+            process.UseShellExecute = true;
+            if(game.runAsAdmin == true) {
+                process.Verb = "runas";
+            }
+
+            try {
+                Process.Start(process);
+            } catch(Exception ex) {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         private void linkOpen(String url) {
             Process myProcess = new Process();
 
@@ -99,11 +125,25 @@ namespace ThnOlgLauncher {
                 Console.WriteLine(ex.Message);
             }
         }
-        private void mainWindow_Loaded(object sender, RoutedEventArgs e) {
-            jsonStorage.loadJson(data);
+
+        private async void updateServerPing() {
+            updatePingButton.IsEnabled = false;
+            await Task.Run(() => {
+                data.servers.ForEach(s => s.ping = Pinger.pingServer(s));
+            });
+            serverList.Items.Refresh();
+            updatePingButton.IsEnabled = true;
+        }
+
+        private void setDataBindings() {
             gameList.ItemsSource = data.games;
             serverList.ItemsSource = data.servers;
+        }
 
+        private void mainWindow_Loaded(object sender, RoutedEventArgs e) {
+            jsonStorage.loadJson(data);
+            setDataBindings();
+            updateServerPing();
             setPingElementsEnable(false);
         }
 
@@ -158,7 +198,7 @@ namespace ThnOlgLauncher {
             linkOpen("http://www.thehellnet.org/");
         }
 
-        private void ComboBox_Initialized(object sender, EventArgs e) {
+        private void GameSelectComboBox_Initialized(object sender, EventArgs e) {
             ComboBox comboBox = (ComboBox) sender;
             data.games.ForEach(game => comboBox.Items.Add(game.tag));
         }
@@ -191,6 +231,34 @@ namespace ThnOlgLauncher {
         private void gameSaveButton_Click(object sender, RoutedEventArgs e) {
             jsonStorage.saveJsonGames(data);
             gameSaveButtonUpdateEnable();
+        }
+
+        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if(e.Source is TabControl) {
+                if(demoTab.IsSelected) {
+                    Console.WriteLine("update");
+                    demoGameCombo.Items.Clear();
+                    data.games.ForEach(game => demoGameCombo.Items.Add(game.tag));
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void demoFileButton_Click(object sender, RoutedEventArgs e) {
+            System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
+            dialog.Filter = "DEMO Files (*.dm_1)|*.dm_1";
+            dialog.FilterIndex = 1;
+            dialog.Multiselect = false;
+            dialog.ShowDialog();
+            demoFileText.Text = dialog.FileName;
+        }
+
+        private void demoLaunchButton_Click(object sender, RoutedEventArgs e) {
+            launchDemo();
+        }
+
+        private void updatePingButton_Click(object sender, RoutedEventArgs e) {
+            updateServerPing();
         }
     }
 }

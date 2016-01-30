@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Web.Script.Serialization;
 using ThnOlgLauncher.model;
+using ThnOlgLauncher.pinger;
 
 namespace ThnOlgLauncher.controller {
     class JsonStorage {
@@ -64,6 +65,8 @@ namespace ThnOlgLauncher.controller {
             } catch(Exception ex) {
                 Console.WriteLine(ex.Message);
             }
+
+            data.servers.ForEach(s => s.ping = 0);
         }
 
         public void saveJsonGames(DataStore data) {
