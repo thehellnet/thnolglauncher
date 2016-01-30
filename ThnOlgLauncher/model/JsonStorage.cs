@@ -51,6 +51,11 @@ namespace ThnOlgLauncher.controller {
             } catch(Exception ex) {
                 Console.WriteLine(ex.Message);
             }
+
+            data.servers.ForEach(s => {
+                s.ping = 0;
+                s.players = 0;
+            });
         }
 
         private void loadJsonServers(DataStore data) {
@@ -65,8 +70,6 @@ namespace ThnOlgLauncher.controller {
             } catch(Exception ex) {
                 Console.WriteLine(ex.Message);
             }
-
-            data.servers.ForEach(s => s.ping = 0);
         }
 
         public void saveJsonGames(DataStore data) {

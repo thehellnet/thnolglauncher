@@ -8,8 +8,20 @@ using System.Threading.Tasks;
 using ThnOlgLauncher.model;
 
 namespace ThnOlgLauncher.pinger {
+    public class PingResult {
+        public int ping { get; set; }
+        public int players { get; set; }
+
+        public PingResult() {
+            this.ping = 0;
+            this.players = 0;
+        }
+    }
+
     class Pinger {
-        public static int pingServer(Server server) {
+        public static PingResult pingServer(Server server) {
+            PingResult pingResult = new PingResult();
+
             UdpClient sck = new UdpClient();
             sck.Client.ReceiveTimeout = 500;
             sck.Connect(server.address, server.port);
@@ -25,15 +37,20 @@ namespace ThnOlgLauncher.pinger {
                 recvData = sck.Receive(ref RemoteIpEndPoint);
             } catch(Exception e) {
                 Console.WriteLine(e.StackTrace);
-                return 0;
+                return pingResult;
             }
 
             DateTime timeStop = DateTime.Now;
             string returnData = Encoding.ASCII.GetString(recvData);
             sck.Close();
 
+            Console.WriteLine(returnData);
+
             TimeSpan timeSpan = timeStop - timeStart;
-            return (int) timeSpan.TotalMilliseconds;
+            pingResult.ping = (int) timeSpan.TotalMilliseconds;
+            pingResult.players = returnData.Split('\n').Length - 3;
+
+            return pingResult;
         }
     }
 }

@@ -22,6 +22,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 using static System.Environment;
 using ThnOlgLauncher.pinger;
+using System.Windows.Controls.Primitives;
 
 namespace ThnOlgLauncher {
     /// <summary>
@@ -126,11 +127,17 @@ namespace ThnOlgLauncher {
             }
         }
 
-        private async void updateServerPing() {
+        private async void updateServerPingAndPlayers() {
             updatePingButton.IsEnabled = false;
+
             await Task.Run(() => {
-                data.servers.ForEach(s => s.ping = Pinger.pingServer(s));
+                data.servers.ForEach(s => {
+                    PingResult pingResult = Pinger.pingServer(s);
+                    s.ping = pingResult.ping;
+                    s.players = pingResult.players;
+                });
             });
+
             serverList.Items.Refresh();
             updatePingButton.IsEnabled = true;
         }
@@ -143,7 +150,7 @@ namespace ThnOlgLauncher {
         private void mainWindow_Loaded(object sender, RoutedEventArgs e) {
             jsonStorage.loadJson(data);
             setDataBindings();
-            updateServerPing();
+            updateServerPingAndPlayers();
             setPingElementsEnable(false);
         }
 
@@ -258,7 +265,7 @@ namespace ThnOlgLauncher {
         }
 
         private void updatePingButton_Click(object sender, RoutedEventArgs e) {
-            updateServerPing();
+            updateServerPingAndPlayers();
         }
     }
 }

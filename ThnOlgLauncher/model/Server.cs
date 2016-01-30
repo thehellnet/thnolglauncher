@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace ThnOlgLauncher.model
 {
@@ -13,6 +14,11 @@ namespace ThnOlgLauncher.model
         public String gameTag { get; set; }
         public String address { get; set; }
         public UInt16 port { get; set; }
+
+        [ScriptIgnore]
         public int ping { get; set; }
+
+        [ScriptIgnore]
+        public int players { get; set; }
     }
 }

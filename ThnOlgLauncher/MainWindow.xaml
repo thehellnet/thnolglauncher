@@ -25,6 +25,7 @@
                             <DataGridTextColumn Header="Address" Width="Auto" Binding="{Binding address}"/>
                             <DataGridTextColumn Header="Port" Width="Auto" Binding="{Binding port}"/>
                             <DataGridTextColumn Header="Ping" Width="Auto" IsReadOnly="True" Binding="{Binding ping}" />
+                            <DataGridTextColumn Header="Players" Width="Auto" IsReadOnly="True" Binding="{Binding players}" />
                         </DataGrid.Columns>
                     </DataGrid>
                     <Button x:Name="serverLaunchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="serverLaunchButton_Click"/>
