@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ThnOlgLauncher"
         mc:Ignorable="d"
-        Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded" Icon="ic_launcher.ico">
+        Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded" Icon="ic_launcher.ico" MinWidth="640" MinHeight="360">
     <Grid>
         <TabControl x:Name="tabControl" Margin="10,10,10,37" TabStripPlacement="Left" SelectionChanged="tabControl_SelectionChanged">
             <TabItem x:Name="serverTab" Header="Servers">
@@ -18,7 +18,7 @@
                             <ComboBox Text="{Binding gameTag}" Height="16" Initialized="GameSelectComboBox_Initialized"/>
                         </DataTemplate>
                     </Grid.Resources>
-                    <DataGrid x:Name="serverList" Margin="10,10,10,37" SelectionChanged="serverListUpdate" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverListUpdate" EnableRowVirtualization="False" KeyDown="serverListUpdate" CurrentCellChanged="serverListUpdate">
+                    <DataGrid x:Name="serverList" Margin="10,10,10,37" SelectionChanged="serverListSelectionChange" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverListUpdate" EnableRowVirtualization="False" KeyDown="serverListUpdate" CurrentCellChanged="serverListUpdate">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Description" Width="Auto" Binding="{Binding name}"/>
                             <DataGridTemplateColumn Header="Game" Width="Auto" CellTemplate="{StaticResource GameSelectTemplate}" CellEditingTemplate="{StaticResource GameSelectTemplateEditing}" />
@@ -31,6 +31,8 @@
                     <Button x:Name="serverLaunchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="serverLaunchButton_Click"/>
                     <Button x:Name="serverSaveButton" Content="Save" HorizontalAlignment="Left" Margin="10,0,0,10" Width="100" Click="serverSaveButton_Click" IsEnabled="False" Height="22" VerticalAlignment="Bottom"/>
                     <Button x:Name="updatePingButton" Content="Update Ping" HorizontalAlignment="Right" Margin="0,0,115,10" Width="100" Height="22" VerticalAlignment="Bottom" Click="updatePingButton_Click"/>
+                    <Button x:Name="serverMoveUpButton" Content="Move UP" HorizontalAlignment="Left" Margin="115,0,0,10" Width="80" Height="22" VerticalAlignment="Bottom" Click="serverMoveUpButton_Click"/>
+                    <Button x:Name="serverMoveDownButton" Content="Move DOWN" HorizontalAlignment="Left" Margin="200,0,0,10" Width="80" Height="22" VerticalAlignment="Bottom" Click="serverMoveDownButton_Click"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="gameTab" Header="Games">

@@ -129,6 +129,7 @@ namespace ThnOlgLauncher {
 
         private async void updateServerPingAndPlayers() {
             updatePingButton.IsEnabled = false;
+            setServerMoveButtonStatus(false);
 
             await Task.Run(() => {
                 data.servers.ForEach(s => {
@@ -139,6 +140,7 @@ namespace ThnOlgLauncher {
             });
 
             serverList.Items.Refresh();
+            setServerMoveButtonStatus(true);
             updatePingButton.IsEnabled = true;
         }
 
@@ -152,6 +154,17 @@ namespace ThnOlgLauncher {
             setDataBindings();
             updateServerPingAndPlayers();
             setPingElementsEnable(false);
+            //setServerMoveButtonStatus(true);
+        }
+
+        private void setServerMoveButtonStatus(bool status) {
+            if(status && serverList.SelectedItem != null) {
+                serverMoveUpButton.IsEnabled = serverList.SelectedIndex > 0;
+                serverMoveDownButton.IsEnabled = serverList.SelectedIndex < data.servers.Count - 1;
+            } else {
+                serverMoveUpButton.IsEnabled = false;
+                serverMoveDownButton.IsEnabled = false;
+            }
         }
 
         private void exitButton_Click(object sender, RoutedEventArgs e) {
@@ -266,6 +279,29 @@ namespace ThnOlgLauncher {
 
         private void updatePingButton_Click(object sender, RoutedEventArgs e) {
             updateServerPingAndPlayers();
+        }
+
+        private void serverListSelectionChange(object sender, SelectionChangedEventArgs e) {
+            serverListUpdate(sender, e);
+            setServerMoveButtonStatus(true);
+        }
+
+        private void serverMoveDownButton_Click(object sender, RoutedEventArgs e) {
+            int index = serverList.SelectedIndex;
+            Server tempServer = data.servers[index];
+            data.servers[index] = data.servers[index + 1];
+            data.servers[index + 1] = tempServer;
+            serverList.Items.Refresh();
+            setServerMoveButtonStatus(true);
+        }
+
+        private void serverMoveUpButton_Click(object sender, RoutedEventArgs e) {
+            int index = serverList.SelectedIndex;
+            Server tempServer = data.servers[index];
+            data.servers[index] = data.servers[index - 1];
+            data.servers[index - 1] = tempServer;
+            serverList.Items.Refresh();
+            setServerMoveButtonStatus(true);
         }
     }
 }

@@ -8,16 +8,6 @@ using System.Threading.Tasks;
 using ThnOlgLauncher.model;
 
 namespace ThnOlgLauncher.pinger {
-    public class PingResult {
-        public int ping { get; set; }
-        public int players { get; set; }
-
-        public PingResult() {
-            this.ping = 0;
-            this.players = 0;
-        }
-    }
-
     class Pinger {
         public static PingResult pingServer(Server server) {
             PingResult pingResult = new PingResult();
