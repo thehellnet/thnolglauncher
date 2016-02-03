@@ -19,6 +19,9 @@ namespace ThnOlgLauncher.model
         public int ping { get; set; }
 
         [ScriptIgnore]
-        public int players { get; set; }
+        public String players { get; set; }
+
+        [ScriptIgnore]
+        public String map { get; set; }
     }
 }

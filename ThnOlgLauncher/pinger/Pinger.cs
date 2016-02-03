@@ -38,7 +38,27 @@ namespace ThnOlgLauncher.pinger {
 
             TimeSpan timeSpan = timeStop - timeStart;
             pingResult.ping = (int) timeSpan.TotalMilliseconds;
-            pingResult.players = returnData.Split('\n').Length - 3;
+
+            String[] rows = returnData.Split('\n');
+            pingResult.players = rows.Length - 3;
+
+            String[] serverConfig = rows[1].Split('\\');
+            for(int i = 1; (i + 1) < serverConfig.Length; i += 2) {
+                String param = serverConfig[i];
+                String value = serverConfig[i + 1];
+                switch(param) {
+                    case "sv_maxclients":
+                        Console.WriteLine("{0} {1}", param, value);
+                        pingResult.maxPlayers = Int32.Parse(value);
+                        break;
+                    case "g_gametype":
+                        pingResult.gametype = value;
+                        break;
+                    case "mapname":
+                        pingResult.map = value;
+                        break;
+                }
+            }
 
             return pingResult;
         }

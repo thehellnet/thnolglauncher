@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ThnOlgLauncher"
         mc:Ignorable="d"
-        Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded" Icon="ic_launcher.ico" MinWidth="640" MinHeight="360">
+        Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded" Icon="ic_launcher.ico" MinWidth="800" MinHeight="400">
     <Grid>
         <TabControl x:Name="tabControl" Margin="10,10,10,37" TabStripPlacement="Left" SelectionChanged="tabControl_SelectionChanged">
             <TabItem x:Name="serverTab" Header="Servers">
@@ -26,6 +26,7 @@
                             <DataGridTextColumn Header="Port" Width="Auto" Binding="{Binding port}"/>
                             <DataGridTextColumn Header="Ping" Width="Auto" IsReadOnly="True" Binding="{Binding ping}" />
                             <DataGridTextColumn Header="Players" Width="Auto" IsReadOnly="True" Binding="{Binding players}" />
+                            <DataGridTextColumn Header="Maps" Width="Auto" IsReadOnly="True" Binding="{Binding map}" />
                         </DataGrid.Columns>
                     </DataGrid>
                     <Button x:Name="serverLaunchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="serverLaunchButton_Click"/>

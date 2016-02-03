@@ -54,7 +54,8 @@ namespace ThnOlgLauncher.controller {
 
             data.servers.ForEach(s => {
                 s.ping = 0;
-                s.players = 0;
+                s.players = "";
+                s.map = "";
             });
         }
 

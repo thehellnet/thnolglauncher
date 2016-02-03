@@ -135,7 +135,8 @@ namespace ThnOlgLauncher {
                 data.servers.ForEach(s => {
                     PingResult pingResult = Pinger.pingServer(s);
                     s.ping = pingResult.ping;
-                    s.players = pingResult.players;
+                    s.players = String.Format("{0}/{1}", new object[] { pingResult.players, pingResult.maxPlayers });
+                    s.map = pingResult.map.Length > 0 ? pingResult.map + " (" + pingResult.gametype + ")" : "";
                 });
             });
 
