@@ -105,6 +105,7 @@ namespace ThnOlgLauncher {
 
         private async void updateServerPingAndPlayers() {
             updatePingButton.IsEnabled = false;
+            serverList.IsReadOnly = true;
             setServerMoveButtonStatus(false);
 
             await Task.Run(() => {
@@ -117,6 +118,7 @@ namespace ThnOlgLauncher {
             });
 
             serverList.Items.Refresh();
+            serverList.IsReadOnly = false;
             setServerMoveButtonStatus(true);
             updatePingButton.IsEnabled = true;
         }
