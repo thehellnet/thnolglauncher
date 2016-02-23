@@ -34,6 +34,7 @@ namespace ThnOlgLauncher {
 
         private DataStore data = new DataStore();
         private JsonStorage jsonStorage = new JsonStorage();
+        private Process gameProcess;
 
         public MainWindow() {
             InitializeComponent();
@@ -59,7 +60,7 @@ namespace ThnOlgLauncher {
             }
 
             try {
-                Process.Start(process);
+                gameProcess = Process.Start(process);
             } catch(Exception ex) {
                 MessageBox.Show(ex.Message);
             }
@@ -77,31 +78,6 @@ namespace ThnOlgLauncher {
 
             ProcessStartInfo process = new ProcessStartInfo(game.executable);
             process.WorkingDirectory = workingDirectory;
-            process.UseShellExecute = true;
-            if(game.runAsAdmin == true) {
-                process.Verb = "runas";
-            }
-
-            try {
-                Process.Start(process);
-            } catch(Exception ex) {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void launchDemo() {
-            Game game = data.games.Find(item => item.tag == demoGameCombo.Text);
-            if(game == null) {
-                MessageBox.Show("Game not found!\nPlease add a game in Games tab", "ERROR");
-                return;
-            }
-
-            String arguments = " +demo " + demoFileText.Text;
-            String workingDirectory = new FileInfo(game.executable).Directory.FullName;
-
-            ProcessStartInfo process = new ProcessStartInfo(game.executable);
-            process.WorkingDirectory = workingDirectory;
-            process.Arguments = arguments;
             process.UseShellExecute = true;
             if(game.runAsAdmin == true) {
                 process.Verb = "runas";
@@ -252,30 +228,6 @@ namespace ThnOlgLauncher {
         private void gameSaveButton_Click(object sender, RoutedEventArgs e) {
             jsonStorage.saveJsonGames(data);
             gameSaveButtonUpdateEnable();
-        }
-
-        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            if(e.Source is TabControl) {
-                if(demoTab.IsSelected) {
-                    Console.WriteLine("update");
-                    demoGameCombo.Items.Clear();
-                    data.games.ForEach(game => demoGameCombo.Items.Add(game.tag));
-                }
-            }
-            e.Handled = true;
-        }
-
-        private void demoFileButton_Click(object sender, RoutedEventArgs e) {
-            System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
-            dialog.Filter = "DEMO Files (*.dm_1)|*.dm_1";
-            dialog.FilterIndex = 1;
-            dialog.Multiselect = false;
-            dialog.ShowDialog();
-            demoFileText.Text = dialog.FileName;
-        }
-
-        private void demoLaunchButton_Click(object sender, RoutedEventArgs e) {
-            launchDemo();
         }
 
         private void updatePingButton_Click(object sender, RoutedEventArgs e) {

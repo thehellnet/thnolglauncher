@@ -14,12 +14,22 @@ namespace ThnOlgLauncher.pinger {
 
             UdpClient sck = new UdpClient();
             sck.Client.ReceiveTimeout = 500;
-            sck.Connect(server.address, server.port);
+            try {
+                sck.Connect(server.address, server.port);
+            } catch(SocketException e) {
+                Console.WriteLine(e.StackTrace);
+                return pingResult;
+            }
 
             Byte[] sendBytes = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x67, 0x65, 0x74, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x0A };
 
             DateTime timeStart = DateTime.Now;
-            sck.Send(sendBytes, sendBytes.Length);
+            try {
+                sck.Send(sendBytes, sendBytes.Length);
+            } catch(Exception e) {
+                Console.WriteLine(e.StackTrace);
+                return pingResult;
+            }
 
             IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
             byte[] recvData;
