@@ -106,21 +106,37 @@ namespace ThnOlgLauncher {
         private async void updateServerPingAndPlayers() {
             updatePingButton.IsEnabled = false;
             serverList.IsReadOnly = true;
+            progressBar.Visibility = Visibility.Visible;
             setServerMoveButtonStatus(false);
 
+            progressBar.Maximum = data.servers.Count;
+            progressBar.Value = 0;
+
+            var progress = new Progress<int>((value) => {
+                serverList.Items.Refresh();
+                progressBar.Value += 1;
+            });
+
             await Task.Run(() => {
-                data.servers.ForEach(s => {
-                    PingResult pingResult = Pinger.pingServer(s);
-                    s.ping = pingResult.ping;
-                    s.players = String.Format("{0}/{1}", new object[] { pingResult.players, pingResult.maxPlayers });
-                    s.map = pingResult.map.Length > 0 ? pingResult.map + " (" + pingResult.gametype + ")" : "";
-                });
+                data.servers.ForEach(s => updateServerInfos(s, progress));
             });
 
             serverList.Items.Refresh();
+
+            progressBar.Value = 0;
+            progressBar.Visibility = Visibility.Hidden;
+
             serverList.IsReadOnly = false;
             setServerMoveButtonStatus(true);
             updatePingButton.IsEnabled = true;
+        }
+
+        private void updateServerInfos(Server server, IProgress<int> progress) {
+            PingResult pingResult = Pinger.pingServer(server);
+            server.ping = pingResult.ping;
+            server.players = String.Format("{0}/{1}", new object[] { pingResult.players, pingResult.maxPlayers });
+            server.map = pingResult.map.Length > 0 ? pingResult.map + " (" + pingResult.gametype + ")" : "";
+            progress.Report(0);
         }
 
         private void setDataBindings() {
@@ -129,6 +145,8 @@ namespace ThnOlgLauncher {
         }
 
         private void mainWindow_Loaded(object sender, RoutedEventArgs e) {
+            progressBar.Visibility = Visibility.Hidden;
+
             jsonStorage.loadJson(data);
             setDataBindings();
             updateServerPingAndPlayers();

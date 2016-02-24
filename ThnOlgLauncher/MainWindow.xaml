@@ -34,6 +34,7 @@
                     <Button x:Name="updatePingButton" Content="Update Ping" HorizontalAlignment="Right" Margin="0,0,115,10" Width="100" Height="22" VerticalAlignment="Bottom" Click="updatePingButton_Click"/>
                     <Button x:Name="serverMoveUpButton" Content="Move UP" HorizontalAlignment="Left" Margin="115,0,0,10" Width="80" Height="22" VerticalAlignment="Bottom" Click="serverMoveUpButton_Click"/>
                     <Button x:Name="serverMoveDownButton" Content="Move DOWN" HorizontalAlignment="Left" Margin="200,0,0,10" Width="80" Height="22" VerticalAlignment="Bottom" Click="serverMoveDownButton_Click"/>
+                    <ProgressBar x:Name="progressBar" Margin="285,0,220,10" Height="22" VerticalAlignment="Bottom"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="gameTab" Header="Games">
