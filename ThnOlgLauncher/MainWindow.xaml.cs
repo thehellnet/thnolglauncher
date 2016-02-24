@@ -145,13 +145,20 @@ namespace ThnOlgLauncher {
         }
 
         private void mainWindow_Loaded(object sender, RoutedEventArgs e) {
-            progressBar.Visibility = Visibility.Hidden;
-
+            prepareUi();
             jsonStorage.loadJson(data);
             setDataBindings();
             updateServerPingAndPlayers();
             setPingElementsEnable(false);
             //setServerMoveButtonStatus(true);
+        }
+
+        private void prepareUi() {
+            progressBar.Visibility = Visibility.Hidden;
+
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            versionText.Text = "Version " + fvi.FileVersion;
         }
 
         private void setServerMoveButtonStatus(bool status) {

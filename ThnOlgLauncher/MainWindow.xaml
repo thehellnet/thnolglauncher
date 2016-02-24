@@ -72,6 +72,7 @@
                 <Grid Background="#FFE5E5E5">
                     <TextBlock x:Name="linkText" Margin="10,0,0,10" TextWrapping="Wrap" Text="http://www.thehellnet.org" Foreground="Blue" MouseLeftButtonDown="linkText_MouseLeftButtonDown" HorizontalAlignment="Left" Width="137" Height="16" VerticalAlignment="Bottom"/>
                     <TextBlock x:Name="descriptionText" HorizontalAlignment="Left" Margin="10,0,0,26" TextWrapping="Wrap" Text="The HellNet.org On-Line Games Launcher" Height="16" VerticalAlignment="Bottom"/>
+                    <TextBlock x:Name="versionText" Margin="0,0,10,10" TextWrapping="Wrap" Height="16" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="150" TextAlignment="Right" FontStyle="Italic"><Run Text="Version"/><LineBreak/><Run/></TextBlock>
                 </Grid>
             </TabItem>
         </TabControl>
