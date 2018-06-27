@@ -24,11 +24,13 @@ using static System.Environment;
 using ThnOlgLauncher.pinger;
 using System.Windows.Controls.Primitives;
 
-namespace ThnOlgLauncher {
+namespace ThnOlgLauncher
+{
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window {
+    public partial class MainWindow : Window
+    {
         //The operation was canceled by the user.
         private const int ERROR_CANCELLED = 1223;
 
@@ -36,14 +38,17 @@ namespace ThnOlgLauncher {
         private JsonStorage jsonStorage = new JsonStorage();
         private Process gameProcess;
 
-        public MainWindow() {
+        public MainWindow()
+        {
             InitializeComponent();
         }
 
-        private void launchServer() {
-            Server server = (Server) mainWindow.serverList.SelectedItem;
+        private void launchServer()
+        {
+            Server server = (Server)mainWindow.serverList.SelectedItem;
             Game game = data.games.Find(item => item.tag == server.gameTag);
-            if(game == null) {
+            if (game == null)
+            {
                 MessageBox.Show("Game not found!\nPlease add a game in Games tab and assign it to this server", "ERROR");
                 return;
             }
@@ -55,21 +60,27 @@ namespace ThnOlgLauncher {
             process.WorkingDirectory = workingDirectory;
             process.Arguments = arguments;
             process.UseShellExecute = true;
-            if(game.runAsAdmin == true) {
+            if (game.runAsAdmin == true)
+            {
                 process.Verb = "runas";
             }
 
-            try {
+            try
+            {
                 gameProcess = Process.Start(process);
-            } catch(Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 MessageBox.Show(ex.Message);
             }
         }
 
-        private void launchGame() {
-            Server server = (Server) mainWindow.serverList.SelectedItem;
-            Game game = (Game) gameList.SelectedItem;
-            if(game == null) {
+        private void launchGame()
+        {
+            Server server = (Server)mainWindow.serverList.SelectedItem;
+            Game game = (Game)gameList.SelectedItem;
+            if (game == null)
+            {
                 MessageBox.Show("Game not found!\nPlease add a game in Games tab and assign it to this server", "ERROR");
                 return;
             }
@@ -79,31 +90,40 @@ namespace ThnOlgLauncher {
             ProcessStartInfo process = new ProcessStartInfo(game.executable);
             process.WorkingDirectory = workingDirectory;
             process.UseShellExecute = true;
-            if(game.runAsAdmin == true) {
+            if (game.runAsAdmin == true)
+            {
                 process.Verb = "runas";
             }
 
-            try {
+            try
+            {
                 Process.Start(process);
-            } catch(Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 MessageBox.Show(ex.Message);
             }
         }
 
-        private void linkOpen(String url) {
+        private void linkOpen(String url)
+        {
             Process myProcess = new Process();
 
-            try {
+            try
+            {
                 // true is the default, but it is important not to set it to false
                 myProcess.StartInfo.UseShellExecute = true;
                 myProcess.StartInfo.FileName = url;
                 myProcess.Start();
-            } catch(Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine(ex.Message);
             }
         }
 
-        private async void updateServerPingAndPlayers() {
+        private async void updateServerPingAndPlayers()
+        {
             updatePingButton.IsEnabled = false;
             serverList.IsReadOnly = true;
             progressBar.Visibility = Visibility.Visible;
@@ -112,12 +132,14 @@ namespace ThnOlgLauncher {
             progressBar.Maximum = data.servers.Count;
             progressBar.Value = 0;
 
-            var progress = new Progress<int>((value) => {
+            var progress = new Progress<int>((value) =>
+            {
                 serverList.Items.Refresh();
                 progressBar.Value += 1;
             });
 
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 data.servers.ForEach(s => updateServerInfos(s, progress));
             });
 
@@ -131,7 +153,8 @@ namespace ThnOlgLauncher {
             updatePingButton.IsEnabled = true;
         }
 
-        private void updateServerInfos(Server server, IProgress<int> progress) {
+        private void updateServerInfos(Server server, IProgress<int> progress)
+        {
             PingResult pingResult = Pinger.pingServer(server);
             server.ping = pingResult.ping;
             server.players = String.Format("{0}/{1}", new object[] { pingResult.players, pingResult.maxPlayers });
@@ -139,12 +162,14 @@ namespace ThnOlgLauncher {
             progress.Report(0);
         }
 
-        private void setDataBindings() {
+        private void setDataBindings()
+        {
             gameList.ItemsSource = data.games;
             serverList.ItemsSource = data.servers;
         }
 
-        private void mainWindow_Loaded(object sender, RoutedEventArgs e) {
+        private void mainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
             prepareUi();
             jsonStorage.loadJson(data);
             setDataBindings();
@@ -153,7 +178,8 @@ namespace ThnOlgLauncher {
             //setServerMoveButtonStatus(true);
         }
 
-        private void prepareUi() {
+        private void prepareUi()
+        {
             progressBar.Visibility = Visibility.Hidden;
 
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
@@ -161,47 +187,59 @@ namespace ThnOlgLauncher {
             versionText.Text = "Version " + fvi.FileVersion;
         }
 
-        private void setServerMoveButtonStatus(bool status) {
-            if(status && serverList.SelectedItem != null) {
+        private void setServerMoveButtonStatus(bool status)
+        {
+            if (status && serverList.SelectedItem != null)
+            {
                 serverMoveUpButton.IsEnabled = serverList.SelectedIndex > 0;
                 serverMoveDownButton.IsEnabled = serverList.SelectedIndex < data.servers.Count - 1;
-            } else {
+            }
+            else
+            {
                 serverMoveUpButton.IsEnabled = false;
                 serverMoveDownButton.IsEnabled = false;
             }
         }
 
-        private void exitButton_Click(object sender, RoutedEventArgs e) {
+        private void exitButton_Click(object sender, RoutedEventArgs e)
+        {
             Application.Current.Shutdown();
         }
 
-        private void serverListUpdate(object sender, EventArgs e) {
+        private void serverListUpdate(object sender, EventArgs e)
+        {
             serverSaveButtonUpdateEnable();
             serverLaunchButtonUpdateEnable();
         }
 
-        private void gameListUpdate(object sender, EventArgs e) {
+        private void gameListUpdate(object sender, EventArgs e)
+        {
             gameSaveButtonUpdateEnable();
             gameLaunchButtonUpdateEnable();
         }
 
-        private void serverLaunchButtonUpdateEnable() {
+        private void serverLaunchButtonUpdateEnable()
+        {
             serverLaunchButton.IsEnabled = serverList.SelectedItem != null;
         }
 
-        private void serverSaveButtonUpdateEnable() {
+        private void serverSaveButtonUpdateEnable()
+        {
             serverSaveButton.IsEnabled = jsonStorage.isDirtyServer(data);
         }
 
-        private void gameLaunchButtonUpdateEnable() {
+        private void gameLaunchButtonUpdateEnable()
+        {
             gameLaunchButton.IsEnabled = gameList.SelectedItem != null;
         }
 
-        private void gameSaveButtonUpdateEnable() {
+        private void gameSaveButtonUpdateEnable()
+        {
             gameSaveButton.IsEnabled = jsonStorage.isDirtyGame(data);
         }
 
-        private void gameExecutableButton_Click(object sender, RoutedEventArgs e) {
+        private void gameExecutableButton_Click(object sender, RoutedEventArgs e)
+        {
             System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
             dialog.Filter = "Executables (*.exe)|*.exe";
             dialog.FilterIndex = 1;
@@ -209,64 +247,77 @@ namespace ThnOlgLauncher {
             dialog.ShowDialog();
             String fileName = dialog.FileName;
 
-            Game game = (Game) gameList.SelectedItem;
+            Game game = (Game)gameList.SelectedItem;
             game.executable = fileName;
-            Button button = (Button) sender;
-            System.Windows.Controls.Grid grid = (System.Windows.Controls.Grid) button.Parent;
+            Button button = (Button)sender;
+            System.Windows.Controls.Grid grid = (System.Windows.Controls.Grid)button.Parent;
             TextBlock textBlock = grid.Children.OfType<TextBlock>().First();
             textBlock.Text = fileName;
             serverSaveButtonUpdateEnable();
         }
 
-        private void linkText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+        private void linkText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
             linkOpen("http://www.thehellnet.org/");
         }
 
-        private void GameSelectComboBox_Initialized(object sender, EventArgs e) {
-            ComboBox comboBox = (ComboBox) sender;
+        private void GameSelectComboBox_Initialized(object sender, EventArgs e)
+        {
+            ComboBox comboBox = (ComboBox)sender;
             data.games.ForEach(game => comboBox.Items.Add(game.tag));
         }
 
-        private void setPingElementsEnable(bool status) {
-            if(status) {
+        private void setPingElementsEnable(bool status)
+        {
+            if (status)
+            {
                 pingAddressPortText.IsEnabled = false;
                 pingStartButton.IsEnabled = false;
                 pingStopButton.IsEnabled = true;
-            } else {
+            }
+            else
+            {
                 pingAddressPortText.IsEnabled = true;
                 pingStartButton.IsEnabled = true;
                 pingStopButton.IsEnabled = false;
             }
         }
 
-        private void serverLaunchButton_Click(object sender, RoutedEventArgs e) {
+        private void serverLaunchButton_Click(object sender, RoutedEventArgs e)
+        {
             launchServer();
         }
 
-        private void gameLaunchButton_Click(object sender, RoutedEventArgs e) {
+        private void gameLaunchButton_Click(object sender, RoutedEventArgs e)
+        {
             launchGame();
         }
 
-        private void serverSaveButton_Click(object sender, RoutedEventArgs e) {
+        private void serverSaveButton_Click(object sender, RoutedEventArgs e)
+        {
             jsonStorage.saveJsonServers(data);
             serverSaveButtonUpdateEnable();
         }
 
-        private void gameSaveButton_Click(object sender, RoutedEventArgs e) {
+        private void gameSaveButton_Click(object sender, RoutedEventArgs e)
+        {
             jsonStorage.saveJsonGames(data);
             gameSaveButtonUpdateEnable();
         }
 
-        private void updatePingButton_Click(object sender, RoutedEventArgs e) {
+        private void updatePingButton_Click(object sender, RoutedEventArgs e)
+        {
             updateServerPingAndPlayers();
         }
 
-        private void serverListSelectionChange(object sender, SelectionChangedEventArgs e) {
+        private void serverListSelectionChange(object sender, SelectionChangedEventArgs e)
+        {
             serverListUpdate(sender, e);
             setServerMoveButtonStatus(true);
         }
 
-        private void serverMoveDownButton_Click(object sender, RoutedEventArgs e) {
+        private void serverMoveDownButton_Click(object sender, RoutedEventArgs e)
+        {
             int index = serverList.SelectedIndex;
             Server tempServer = data.servers[index];
             data.servers[index] = data.servers[index + 1];
@@ -275,13 +326,33 @@ namespace ThnOlgLauncher {
             setServerMoveButtonStatus(true);
         }
 
-        private void serverMoveUpButton_Click(object sender, RoutedEventArgs e) {
+        private void serverMoveUpButton_Click(object sender, RoutedEventArgs e)
+        {
             int index = serverList.SelectedIndex;
             Server tempServer = data.servers[index];
             data.servers[index] = data.servers[index - 1];
             data.servers[index - 1] = tempServer;
             serverList.Items.Refresh();
             setServerMoveButtonStatus(true);
+        }
+
+        private void integrityFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog
+            {
+                Filter = @"All hash file (*.md5, *.sha1, *.sha256, *.sha512)|*.md5;*.sha1;*.sha256;*.sha512;
+                |MD5 hash file (*.md5)|*.md5
+                |SHA 1 hash file (*.sha1)|*.sha1
+                |SHA 256 hash file (*.sha256)|*.sha256
+                |SHA 512 hash file (*.sha512)|*.sha512",
+                FilterIndex = 1,
+                Multiselect = false
+            };
+            dialog.ShowDialog();
+            String fileName = dialog.FileName;
+
+            integrityFileText.Text = fileName;
+            integrityButtonsUpdateEnable();
         }
 
         private void integrityStartButton_Click(object sender, RoutedEventArgs e)
@@ -292,6 +363,12 @@ namespace ThnOlgLauncher {
         private void integrityStopButton_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void integrityButtonsUpdateEnable()
+        {
+            bool validFile = integrityFileText.Text.Length == 0;
+            integrityStartButton.IsEnabled = validFile;
         }
     }
 }
