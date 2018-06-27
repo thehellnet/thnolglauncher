@@ -283,5 +283,15 @@ namespace ThnOlgLauncher {
             serverList.Items.Refresh();
             setServerMoveButtonStatus(true);
         }
+
+        private void integrityStartButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void integrityStopButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
