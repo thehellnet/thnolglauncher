@@ -5,87 +5,146 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ThnOlgLauncher"
         mc:Ignorable="d"
-        Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded" Icon="ic_launcher.ico" MinWidth="800" MinHeight="400">
+        Title="ThnOlgLauncher" Height="360" Width="640" Loaded="mainWindow_Loaded" Icon="ic_launcher.ico"
+        MinWidth="800" MinHeight="400">
     <Grid>
         <TabControl x:Name="tabControl" Margin="10,10,10,37" TabStripPlacement="Left">
             <TabItem x:Name="serverTab" Header="Servers">
                 <Grid Background="White">
                     <Grid.Resources>
-                        <DataTemplate x:Key="GameSelectTemplate" >
-                            <TextBlock Text="{Binding gameTag}"/>
+                        <DataTemplate x:Key="GameSelectTemplate">
+                            <TextBlock Text="{Binding gameTag}" />
                         </DataTemplate>
-                        <DataTemplate x:Key="GameSelectTemplateEditing" >
-                            <ComboBox Text="{Binding gameTag}" Height="16" Initialized="GameSelectComboBox_Initialized"/>
+                        <DataTemplate x:Key="GameSelectTemplateEditing">
+                            <ComboBox Text="{Binding gameTag}" Height="16" Initialized="GameSelectComboBox_Initialized" />
                         </DataTemplate>
                     </Grid.Resources>
-                    <DataGrid x:Name="serverList" Margin="10,10,10,37" SelectionChanged="serverListSelectionChange" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverListUpdate" EnableRowVirtualization="False" KeyDown="serverListUpdate" CurrentCellChanged="serverListUpdate">
+                    <DataGrid x:Name="serverList" Margin="10,10,10,37" SelectionChanged="serverListSelectionChange"
+                              SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="serverListUpdate"
+                              EnableRowVirtualization="False" KeyDown="serverListUpdate"
+                              CurrentCellChanged="serverListUpdate">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Description" Width="Auto" Binding="{Binding name}"/>
-                            <DataGridTemplateColumn Header="Game" Width="Auto" CellTemplate="{StaticResource GameSelectTemplate}" CellEditingTemplate="{StaticResource GameSelectTemplateEditing}" />
-                            <DataGridTextColumn Header="Address" Width="Auto" Binding="{Binding address}"/>
-                            <DataGridTextColumn Header="Port" Width="Auto" Binding="{Binding port}"/>
+                            <DataGridTextColumn Header="Description" Width="Auto" Binding="{Binding name}" />
+                            <DataGridTemplateColumn Header="Game" Width="Auto"
+                                                    CellTemplate="{StaticResource GameSelectTemplate}"
+                                                    CellEditingTemplate="{StaticResource GameSelectTemplateEditing}" />
+                            <DataGridTextColumn Header="Address" Width="Auto" Binding="{Binding address}" />
+                            <DataGridTextColumn Header="Port" Width="Auto" Binding="{Binding port}" />
                             <DataGridTextColumn Header="Ping" Width="Auto" IsReadOnly="True" Binding="{Binding ping}" />
-                            <DataGridTextColumn Header="Players" Width="Auto" IsReadOnly="True" Binding="{Binding players}" />
+                            <DataGridTextColumn Header="Players" Width="Auto" IsReadOnly="True"
+                                                Binding="{Binding players}" />
                             <DataGridTextColumn Header="Maps" Width="Auto" IsReadOnly="True" Binding="{Binding map}" />
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button x:Name="serverLaunchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="serverLaunchButton_Click"/>
-                    <Button x:Name="serverSaveButton" Content="Save" HorizontalAlignment="Left" Margin="10,0,0,10" Width="100" Click="serverSaveButton_Click" IsEnabled="False" Height="22" VerticalAlignment="Bottom"/>
-                    <Button x:Name="updatePingButton" Content="Update Ping" HorizontalAlignment="Right" Margin="0,0,115,10" Width="100" Height="22" VerticalAlignment="Bottom" Click="updatePingButton_Click"/>
-                    <Button x:Name="serverMoveUpButton" Content="Move UP" HorizontalAlignment="Left" Margin="115,0,0,10" Width="80" Height="22" VerticalAlignment="Bottom" Click="serverMoveUpButton_Click"/>
-                    <Button x:Name="serverMoveDownButton" Content="Move DOWN" HorizontalAlignment="Left" Margin="200,0,0,10" Width="80" Height="22" VerticalAlignment="Bottom" Click="serverMoveDownButton_Click"/>
-                    <ProgressBar x:Name="progressBar" Margin="285,0,220,10" Height="22" VerticalAlignment="Bottom"/>
+                    <Button x:Name="serverLaunchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right"
+                            Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False"
+                            Click="serverLaunchButton_Click" />
+                    <Button x:Name="serverSaveButton" Content="Save" HorizontalAlignment="Left" Margin="10,0,0,10"
+                            Width="100" Click="serverSaveButton_Click" IsEnabled="False" Height="22"
+                            VerticalAlignment="Bottom" />
+                    <Button x:Name="updatePingButton" Content="Update Ping" HorizontalAlignment="Right"
+                            Margin="0,0,115,10" Width="100" Height="22" VerticalAlignment="Bottom"
+                            Click="updatePingButton_Click" />
+                    <Button x:Name="serverMoveUpButton" Content="Move UP" HorizontalAlignment="Left"
+                            Margin="115,0,0,10" Width="80" Height="22" VerticalAlignment="Bottom"
+                            Click="serverMoveUpButton_Click" />
+                    <Button x:Name="serverMoveDownButton" Content="Move DOWN" HorizontalAlignment="Left"
+                            Margin="200,0,0,10" Width="80" Height="22" VerticalAlignment="Bottom"
+                            Click="serverMoveDownButton_Click" />
+                    <ProgressBar x:Name="progressBar" Margin="285,0,220,10" Height="22" VerticalAlignment="Bottom" />
                 </Grid>
             </TabItem>
             <TabItem x:Name="gameTab" Header="Games">
                 <Grid Background="White">
                     <Grid.Resources>
-                        <DataTemplate x:Key="FilePathTemplate" >
+                        <DataTemplate x:Key="FilePathTemplate">
                             <Grid>
-                                <TextBlock Text="{Binding executable}" Width="auto" Margin="0,0,22,0"  HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0"/>
-                                <Button Content="..." Height="16" Width="20" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="1" Click="gameExecutableButton_Click"/>
+                                <TextBlock Text="{Binding executable}" Width="auto" Margin="0,0,22,0"
+                                           HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" />
+                                <Button Content="..." Height="16" Width="20" HorizontalAlignment="Right" Grid.Row="0"
+                                        Grid.Column="1" Click="gameExecutableButton_Click" />
                             </Grid>
                         </DataTemplate>
                     </Grid.Resources>
-                    <DataGrid x:Name="gameList" Margin="10,10,10,37" SelectionMode="Single" AutoGenerateColumns="False" CellEditEnding="gameListUpdate" EnableRowVirtualization="False" KeyDown="gameListUpdate" CurrentCellChanged="gameListUpdate" SelectionChanged="gameListUpdate">
+                    <DataGrid x:Name="gameList" Margin="10,10,10,37" SelectionMode="Single" AutoGenerateColumns="False"
+                              CellEditEnding="gameListUpdate" EnableRowVirtualization="False" KeyDown="gameListUpdate"
+                              CurrentCellChanged="gameListUpdate" SelectionChanged="gameListUpdate">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding name}"/>
-                            <DataGridTextColumn Header="Tag" Width="Auto" Binding="{Binding tag}"/>
-                            <DataGridTemplateColumn Header="Executable" Width="Auto" CellTemplate="{StaticResource FilePathTemplate}" CellEditingTemplate="{StaticResource FilePathTemplate}"/>
-                            <DataGridCheckBoxColumn Header="Run as Admin" Width="Auto" Binding="{Binding runAsAdmin}"/>
+                            <DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding name}" />
+                            <DataGridTextColumn Header="Tag" Width="Auto" Binding="{Binding tag}" />
+                            <DataGridTemplateColumn Header="Executable" Width="Auto"
+                                                    CellTemplate="{StaticResource FilePathTemplate}"
+                                                    CellEditingTemplate="{StaticResource FilePathTemplate}" />
+                            <DataGridCheckBoxColumn Header="Run as Admin" Width="Auto" Binding="{Binding runAsAdmin}" />
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button x:Name="gameLaunchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="gameLaunchButton_Click"/>
-                    <Button x:Name="gameSaveButton" Content="Save" HorizontalAlignment="Left" Margin="10,0,0,10" Width="100" Click="gameSaveButton_Click" IsEnabled="False" Height="22" VerticalAlignment="Bottom"/>
+                    <Button x:Name="gameLaunchButton" Content="Launch" Margin="0,0,10,10" HorizontalAlignment="Right"
+                            Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False"
+                            Click="gameLaunchButton_Click" />
+                    <Button x:Name="gameSaveButton" Content="Save" HorizontalAlignment="Left" Margin="10,0,0,10"
+                            Width="100" Click="gameSaveButton_Click" IsEnabled="False" Height="22"
+                            VerticalAlignment="Bottom" />
                 </Grid>
             </TabItem>
             <TabItem x:Name="integrityTab" Header="Integrity">
                 <Grid Background="White">
-                    <Label x:Name="integrityFileLabel" Content="Hash file" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="integrityFileText" Height="26" Margin="71,10,41,0" TextWrapping="Wrap" Text="" IsReadOnly="True" VerticalAlignment="Top" />
-                    <Button x:Name="integrityFileButton" Content="..." Margin="0,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="26" Height="26" Click="integrityFileButton_Click"/>
-                    <TextBox x:Name="integrityOutput" Margin="10,41,10,37" TextWrapping="Wrap" IsReadOnly="True"/>
-                    <Button x:Name="integrityStartButton" Content="Start" Margin="0,0,10,10" HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom" IsDefault="True" IsEnabled="False" Click="integrityStartButton_Click"/>
-                    <Button x:Name="integrityStopButton" Content="Stop" Margin="0,0,115,10" IsEnabled="False" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" Click="integrityStopButton_Click"/>
+                    <Label x:Name="integrityFileLabel" Content="Hash file" HorizontalAlignment="Left"
+                           Margin="10,10,0,0" VerticalAlignment="Top" />
+                    <TextBox x:Name="integrityFileText" Height="26" Margin="78,10,10,0" TextWrapping="Wrap" Text=""
+                             IsReadOnly="True" VerticalAlignment="Top" />
+                    <Label x:Name="integrityAlgorithmLabel" Content="Algorithm" HorizontalAlignment="Left"
+                           Margin="10,41,0,0" VerticalAlignment="Top" />
+                    <ComboBox x:Name="integrityAlgorithmCombo" HorizontalAlignment="Left"
+                              Margin="78,41,0,0" VerticalAlignment="Top" Height="26" Width="230" />
+                    <Label x:Name="integrityGameLabel" Content="Game" HorizontalAlignment="Right"
+                           Margin="0,41,135,0" VerticalAlignment="Top" />
+                    <ComboBox x:Name="integrityGameCombo" HorizontalAlignment="Right"
+                              Margin="0,41,10,0" VerticalAlignment="Top" Width="120" Height="26" />
+
+                    <TextBox x:Name="integrityOutput" Margin="10,72,10,37" TextWrapping="Wrap" IsReadOnly="True" />
+                    <Button x:Name="integrityCheckButton" Content="Check" Margin="0,0,10,10"
+                            HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom"
+                            IsDefault="True" IsEnabled="False" Click="integrityCheckButton_Click" />
+                    <Button x:Name="integrityCalculateButton" Content="Calculate" Margin="0,0,115,10"
+                            HorizontalAlignment="Right" Width="100" Height="22" VerticalAlignment="Bottom"
+                            IsDefault="True" IsEnabled="False" Click="integrityCalculateButton_Click" />
+                    <Button x:Name="integrityStopButton" Content="Stop" Margin="10,0,0,10" IsEnabled="False"
+                            Height="22" VerticalAlignment="Bottom"
+                            Click="integrityStopButton_Click" HorizontalAlignment="Left" Width="100" />
                 </Grid>
             </TabItem>
             <TabItem x:Name="pingTab" Header="Ping test">
                 <Grid Background="#FFE5E5E5">
-                    <Border BorderBrush="Black" BorderThickness="1" Height="100" Margin="10,10,10,0" VerticalAlignment="Top"/>
-                    <Button x:Name="pingStartButton" Content="Start ping" Margin="0,115,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75" Height="26"/>
-                    <Button x:Name="pingStopButton" Content="Stop ping" Margin="0,115,90,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75" Height="26"/>
-                    <TextBox x:Name="pingAddressPortText" Height="26" Margin="143,115,170,0" TextWrapping="Wrap" Text="caronte.thehellnet.org:64285" VerticalAlignment="Top" />
-                    <Label x:Name="pingAddressPortLabel" Content="Address and UDP port" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top"/>
+                    <Border BorderBrush="Black" BorderThickness="1" Height="100" Margin="10,10,10,0"
+                            VerticalAlignment="Top" />
+                    <Button x:Name="pingStartButton" Content="Start ping" Margin="0,115,10,0" VerticalAlignment="Top"
+                            HorizontalAlignment="Right" Width="75" Height="26" />
+                    <Button x:Name="pingStopButton" Content="Stop ping" Margin="0,115,90,0" VerticalAlignment="Top"
+                            HorizontalAlignment="Right" Width="75" Height="26" />
+                    <TextBox x:Name="pingAddressPortText" Height="26" Margin="143,115,170,0" TextWrapping="Wrap"
+                             Text="caronte.thehellnet.org:64285" VerticalAlignment="Top" />
+                    <Label x:Name="pingAddressPortLabel" Content="Address and UDP port" HorizontalAlignment="Left"
+                           Margin="10,115,0,0" VerticalAlignment="Top" />
                 </Grid>
             </TabItem>
             <TabItem x:Name="aboutTab" Header="About...">
                 <Grid Background="#FFE5E5E5">
-                    <TextBlock x:Name="linkText" Margin="10,0,0,10" TextWrapping="Wrap" Text="http://www.thehellnet.org" Foreground="Blue" MouseLeftButtonDown="linkText_MouseLeftButtonDown" HorizontalAlignment="Left" Width="137" Height="16" VerticalAlignment="Bottom"/>
-                    <TextBlock x:Name="descriptionText" HorizontalAlignment="Left" Margin="10,0,0,26" TextWrapping="Wrap" Text="The HellNet.org On-Line Games Launcher" Height="16" VerticalAlignment="Bottom"/>
-                    <TextBlock x:Name="versionText" Margin="0,0,10,10" TextWrapping="Wrap" Height="16" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="150" TextAlignment="Right" FontStyle="Italic"><Run Text="Version"/><LineBreak/><Run/></TextBlock>
+                    <TextBlock x:Name="linkText" Margin="10,0,0,10" TextWrapping="Wrap"
+                               Text="http://www.thehellnet.org" Foreground="Blue"
+                               MouseLeftButtonDown="linkText_MouseLeftButtonDown" HorizontalAlignment="Left"
+                               Width="137" Height="16" VerticalAlignment="Bottom" />
+                    <TextBlock x:Name="descriptionText" HorizontalAlignment="Left" Margin="10,0,0,26"
+                               TextWrapping="Wrap" Text="The HellNet.org On-Line Games Launcher" Height="16"
+                               VerticalAlignment="Bottom" />
+                    <TextBlock x:Name="versionText" Margin="0,0,10,10" TextWrapping="Wrap" Height="16"
+                               VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="150" TextAlignment="Right"
+                               FontStyle="Italic">
+                        <Run Text="Version" /><LineBreak /><Run />
+                    </TextBlock>
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button x:Name="exitButton" Content="Exit" Margin="10,0,0,10" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Bottom" Click="exitButton_Click" Grid.Row="1"/>
+        <Button x:Name="exitButton" Content="Exit" Margin="10,0,0,10" HorizontalAlignment="Left" Width="100"
+                Height="22" VerticalAlignment="Bottom" Click="exitButton_Click" Grid.Row="1" />
     </Grid>
 </Window>

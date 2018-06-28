@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,9 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ThnOlgLauncher.controller;
 using ThnOlgLauncher.model;
-
 using System.Windows.Forms.DataVisualization.Charting;
-
 using static System.Environment;
 using ThnOlgLauncher.pinger;
 using System.Windows.Controls.Primitives;
@@ -38,6 +37,8 @@ namespace ThnOlgLauncher
         private JsonStorage jsonStorage = new JsonStorage();
         private Process gameProcess;
 
+        private Thread integrityThread;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -45,11 +46,12 @@ namespace ThnOlgLauncher
 
         private void launchServer()
         {
-            Server server = (Server)mainWindow.serverList.SelectedItem;
+            Server server = (Server) mainWindow.serverList.SelectedItem;
             Game game = data.games.Find(item => item.tag == server.gameTag);
             if (game == null)
             {
-                MessageBox.Show("Game not found!\nPlease add a game in Games tab and assign it to this server", "ERROR");
+                MessageBox.Show("Game not found!\nPlease add a game in Games tab and assign it to this server",
+                    "ERROR");
                 return;
             }
 
@@ -60,7 +62,7 @@ namespace ThnOlgLauncher
             process.WorkingDirectory = workingDirectory;
             process.Arguments = arguments;
             process.UseShellExecute = true;
-            if (game.runAsAdmin == true)
+            if (game.runAsAdmin)
             {
                 process.Verb = "runas";
             }
@@ -77,11 +79,12 @@ namespace ThnOlgLauncher
 
         private void launchGame()
         {
-            Server server = (Server)mainWindow.serverList.SelectedItem;
-            Game game = (Game)gameList.SelectedItem;
+            Server server = (Server) mainWindow.serverList.SelectedItem;
+            Game game = (Game) gameList.SelectedItem;
             if (game == null)
             {
-                MessageBox.Show("Game not found!\nPlease add a game in Games tab and assign it to this server", "ERROR");
+                MessageBox.Show("Game not found!\nPlease add a game in Games tab and assign it to this server",
+                    "ERROR");
                 return;
             }
 
@@ -138,10 +141,7 @@ namespace ThnOlgLauncher
                 progressBar.Value += 1;
             });
 
-            await Task.Run(() =>
-            {
-                data.servers.ForEach(s => updateServerInfos(s, progress));
-            });
+            await Task.Run(() => { data.servers.ForEach(s => updateServerInfos(s, progress)); });
 
             serverList.Items.Refresh();
 
@@ -157,7 +157,7 @@ namespace ThnOlgLauncher
         {
             PingResult pingResult = Pinger.pingServer(server);
             server.ping = pingResult.ping;
-            server.players = String.Format("{0}/{1}", new object[] { pingResult.players, pingResult.maxPlayers });
+            server.players = String.Format("{0}/{1}", new object[] {pingResult.players, pingResult.maxPlayers});
             server.map = pingResult.map.Length > 0 ? pingResult.map + " (" + pingResult.gametype + ")" : "";
             progress.Report(0);
         }
@@ -171,11 +171,14 @@ namespace ThnOlgLauncher
         private void mainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             prepareUi();
+
             jsonStorage.loadJson(data);
             setDataBindings();
             updateServerPingAndPlayers();
             setPingElementsEnable(false);
             //setServerMoveButtonStatus(true);
+
+            integrityButtonsEnable();
         }
 
         private void prepareUi()
@@ -247,10 +250,10 @@ namespace ThnOlgLauncher
             dialog.ShowDialog();
             String fileName = dialog.FileName;
 
-            Game game = (Game)gameList.SelectedItem;
+            Game game = (Game) gameList.SelectedItem;
             game.executable = fileName;
-            Button button = (Button)sender;
-            System.Windows.Controls.Grid grid = (System.Windows.Controls.Grid)button.Parent;
+            Button button = (Button) sender;
+            System.Windows.Controls.Grid grid = (System.Windows.Controls.Grid) button.Parent;
             TextBlock textBlock = grid.Children.OfType<TextBlock>().First();
             textBlock.Text = fileName;
             serverSaveButtonUpdateEnable();
@@ -263,7 +266,7 @@ namespace ThnOlgLauncher
 
         private void GameSelectComboBox_Initialized(object sender, EventArgs e)
         {
-            ComboBox comboBox = (ComboBox)sender;
+            ComboBox comboBox = (ComboBox) sender;
             data.games.ForEach(game => comboBox.Items.Add(game.tag));
         }
 
@@ -352,23 +355,38 @@ namespace ThnOlgLauncher
             String fileName = dialog.FileName;
 
             integrityFileText.Text = fileName;
-            integrityButtonsUpdateEnable();
         }
 
-        private void integrityStartButton_Click(object sender, RoutedEventArgs e)
+        private void integrityCheckButton_Click(object sender, RoutedEventArgs e)
         {
+        }
 
+        private void integrityCalculateButton_Click(object sender, RoutedEventArgs e)
+        {
         }
 
         private void integrityStopButton_Click(object sender, RoutedEventArgs e)
         {
-
         }
 
-        private void integrityButtonsUpdateEnable()
+        private void integrityButtonsEnable()
         {
-            bool validFile = integrityFileText.Text.Length == 0;
-            integrityStartButton.IsEnabled = validFile;
+            var threadRunning = integrityThread != null && integrityThread.IsAlive;
+
+            if (threadRunning)
+            {
+                integrityStopButton.IsEnabled = true;
+                integrityCheckButton.IsEnabled = false;
+                integrityCalculateButton.IsEnabled = false;
+                return;
+            }
+
+            var algorithmSelected = integrityAlgorithmCombo.SelectedIndex != -1;
+            var gameSelected = integrityGameCombo.SelectedIndex != -1;
+
+            integrityStopButton.IsEnabled = false;
+            integrityCheckButton.IsEnabled = algorithmSelected && gameSelected;
+            integrityCalculateButton.IsEnabled = algorithmSelected && gameSelected;
         }
     }
 }
