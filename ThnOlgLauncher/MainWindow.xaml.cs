@@ -1,27 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using ThnOlgLauncher.controller;
 using ThnOlgLauncher.model;
-using System.Windows.Forms.DataVisualization.Charting;
-using static System.Environment;
 using ThnOlgLauncher.pinger;
-using System.Windows.Controls.Primitives;
 
 namespace ThnOlgLauncher
 {
@@ -30,24 +17,21 @@ namespace ThnOlgLauncher
     /// </summary>
     public partial class MainWindow : Window
     {
-        //The operation was canceled by the user.
-        private const int ERROR_CANCELLED = 1223;
+        private readonly DataStore _data = new DataStore();
+        private readonly JsonStorage _jsonStorage = new JsonStorage();
+        private Process _gameProcess;
 
-        private DataStore data = new DataStore();
-        private JsonStorage jsonStorage = new JsonStorage();
-        private Process gameProcess;
-
-        private Thread integrityThread;
+        private Thread _integrityThread;
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void launchServer()
+        private void LaunchServer()
         {
-            Server server = (Server) mainWindow.serverList.SelectedItem;
-            Game game = data.games.Find(item => item.tag == server.gameTag);
+            var server = (Server) mainWindow.serverList.SelectedItem;
+            var game = _data.Games.Find(item => item.Tag == server.GameTag);
             if (game == null)
             {
                 MessageBox.Show("Game not found!\nPlease add a game in Games tab and assign it to this server",
@@ -55,21 +39,28 @@ namespace ThnOlgLauncher
                 return;
             }
 
-            String arguments = " +connect " + server.address + ":" + server.port;
-            String workingDirectory = new FileInfo(game.executable).Directory.FullName;
+            var arguments = " +connect " + server.Address + ":" + server.Port;
+            var directoryInfo = new FileInfo(game.Executable).Directory;
+            if (directoryInfo == null)
+                return;
 
-            ProcessStartInfo process = new ProcessStartInfo(game.executable);
-            process.WorkingDirectory = workingDirectory;
-            process.Arguments = arguments;
-            process.UseShellExecute = true;
-            if (game.runAsAdmin)
+            var workingDirectory = directoryInfo.FullName;
+
+            var process = new ProcessStartInfo(game.Executable)
+            {
+                WorkingDirectory = workingDirectory,
+                Arguments = arguments,
+                UseShellExecute = true
+            };
+
+            if (game.RunAsAdmin)
             {
                 process.Verb = "runas";
             }
 
             try
             {
-                gameProcess = Process.Start(process);
+                _gameProcess = Process.Start(process);
             }
             catch (Exception ex)
             {
@@ -77,10 +68,9 @@ namespace ThnOlgLauncher
             }
         }
 
-        private void launchGame()
+        private void LaunchGame()
         {
-            Server server = (Server) mainWindow.serverList.SelectedItem;
-            Game game = (Game) gameList.SelectedItem;
+            var game = (Game) gameList.SelectedItem;
             if (game == null)
             {
                 MessageBox.Show("Game not found!\nPlease add a game in Games tab and assign it to this server",
@@ -88,12 +78,18 @@ namespace ThnOlgLauncher
                 return;
             }
 
-            String workingDirectory = new FileInfo(game.executable).Directory.FullName;
+            var directoryInfo = new FileInfo(game.Executable).Directory;
+            if (directoryInfo == null)
+                return;
 
-            ProcessStartInfo process = new ProcessStartInfo(game.executable);
-            process.WorkingDirectory = workingDirectory;
-            process.UseShellExecute = true;
-            if (game.runAsAdmin == true)
+            var workingDirectory = directoryInfo.FullName;
+
+            var process = new ProcessStartInfo(game.Executable)
+            {
+                WorkingDirectory = workingDirectory,
+                UseShellExecute = true
+            };
+            if (game.RunAsAdmin)
             {
                 process.Verb = "runas";
             }
@@ -108,13 +104,12 @@ namespace ThnOlgLauncher
             }
         }
 
-        private void linkOpen(String url)
+        private static void LinkOpen(string url)
         {
-            Process myProcess = new Process();
+            var myProcess = new Process();
 
             try
             {
-                // true is the default, but it is important not to set it to false
                 myProcess.StartInfo.UseShellExecute = true;
                 myProcess.StartInfo.FileName = url;
                 myProcess.Start();
@@ -125,14 +120,14 @@ namespace ThnOlgLauncher
             }
         }
 
-        private async void updateServerPingAndPlayers()
+        private async void UpdateServerPingAndPlayers()
         {
             updatePingButton.IsEnabled = false;
             serverList.IsReadOnly = true;
             progressBar.Visibility = Visibility.Visible;
-            setServerMoveButtonStatus(false);
+            SetServerMoveButtonStatus(false);
 
-            progressBar.Maximum = data.servers.Count;
+            progressBar.Maximum = _data.Servers.Count;
             progressBar.Value = 0;
 
             var progress = new Progress<int>((value) =>
@@ -141,7 +136,7 @@ namespace ThnOlgLauncher
                 progressBar.Value += 1;
             });
 
-            await Task.Run(() => { data.servers.ForEach(s => updateServerInfos(s, progress)); });
+            await Task.Run(() => { _data.Servers.ForEach(s => UpdateServerInfos(s, progress)); });
 
             serverList.Items.Refresh();
 
@@ -149,53 +144,53 @@ namespace ThnOlgLauncher
             progressBar.Visibility = Visibility.Hidden;
 
             serverList.IsReadOnly = false;
-            setServerMoveButtonStatus(true);
+            SetServerMoveButtonStatus(true);
             updatePingButton.IsEnabled = true;
         }
 
-        private void updateServerInfos(Server server, IProgress<int> progress)
+        private static void UpdateServerInfos(Server server, IProgress<int> progress)
         {
-            PingResult pingResult = Pinger.pingServer(server);
-            server.ping = pingResult.ping;
-            server.players = String.Format("{0}/{1}", new object[] {pingResult.players, pingResult.maxPlayers});
-            server.map = pingResult.map.Length > 0 ? pingResult.map + " (" + pingResult.gametype + ")" : "";
+            var pingResult = Pinger.PingServer(server);
+            server.Ping = pingResult.Ping;
+            server.Players = string.Format("{0}/{1}", new object[] {pingResult.Players, pingResult.MaxPlayers});
+            server.Map = pingResult.Map.Length > 0 ? pingResult.Map + " (" + pingResult.Gametype + ")" : "";
             progress.Report(0);
         }
 
-        private void setDataBindings()
+        private void SetDataBindings()
         {
-            gameList.ItemsSource = data.games;
-            serverList.ItemsSource = data.servers;
+            gameList.ItemsSource = _data.Games;
+            serverList.ItemsSource = _data.Servers;
         }
 
-        private void mainWindow_Loaded(object sender, RoutedEventArgs e)
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            prepareUi();
+            PrepareUi();
 
-            jsonStorage.loadJson(data);
-            setDataBindings();
-            updateServerPingAndPlayers();
-            setPingElementsEnable(false);
+            _jsonStorage.LoadJson(_data);
+            SetDataBindings();
+            UpdateServerPingAndPlayers();
+            SetPingElementsEnable(false);
             //setServerMoveButtonStatus(true);
 
-            integrityButtonsEnable();
+            IntegrityButtonsEnable();
         }
 
-        private void prepareUi()
+        private void PrepareUi()
         {
             progressBar.Visibility = Visibility.Hidden;
 
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             versionText.Text = "Version " + fvi.FileVersion;
         }
 
-        private void setServerMoveButtonStatus(bool status)
+        private void SetServerMoveButtonStatus(bool status)
         {
             if (status && serverList.SelectedItem != null)
             {
                 serverMoveUpButton.IsEnabled = serverList.SelectedIndex > 0;
-                serverMoveDownButton.IsEnabled = serverList.SelectedIndex < data.servers.Count - 1;
+                serverMoveDownButton.IsEnabled = serverList.SelectedIndex < _data.Servers.Count - 1;
             }
             else
             {
@@ -204,73 +199,76 @@ namespace ThnOlgLauncher
             }
         }
 
-        private void exitButton_Click(object sender, RoutedEventArgs e)
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
         }
 
-        private void serverListUpdate(object sender, EventArgs e)
+        private void ServerListUpdate(object sender, EventArgs e)
         {
-            serverSaveButtonUpdateEnable();
-            serverLaunchButtonUpdateEnable();
+            ServerSaveButtonUpdateEnable();
+            ServerLaunchButtonUpdateEnable();
         }
 
-        private void gameListUpdate(object sender, EventArgs e)
+        private void GameListUpdate(object sender, EventArgs e)
         {
-            gameSaveButtonUpdateEnable();
-            gameLaunchButtonUpdateEnable();
+            GameSaveButtonUpdateEnable();
+            GameLaunchButtonUpdateEnable();
         }
 
-        private void serverLaunchButtonUpdateEnable()
+        private void ServerLaunchButtonUpdateEnable()
         {
             serverLaunchButton.IsEnabled = serverList.SelectedItem != null;
         }
 
-        private void serverSaveButtonUpdateEnable()
+        private void ServerSaveButtonUpdateEnable()
         {
-            serverSaveButton.IsEnabled = jsonStorage.isDirtyServer(data);
+            serverSaveButton.IsEnabled = _jsonStorage.IsDirtyServer(_data);
         }
 
-        private void gameLaunchButtonUpdateEnable()
+        private void GameLaunchButtonUpdateEnable()
         {
             gameLaunchButton.IsEnabled = gameList.SelectedItem != null;
         }
 
-        private void gameSaveButtonUpdateEnable()
+        private void GameSaveButtonUpdateEnable()
         {
-            gameSaveButton.IsEnabled = jsonStorage.isDirtyGame(data);
+            gameSaveButton.IsEnabled = _jsonStorage.IsDirtyGame(_data);
         }
 
-        private void gameExecutableButton_Click(object sender, RoutedEventArgs e)
+        private void GameExecutableButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
-            dialog.Filter = "Executables (*.exe)|*.exe";
-            dialog.FilterIndex = 1;
-            dialog.Multiselect = false;
+            System.Windows.Forms.OpenFileDialog dialog =
+                new System.Windows.Forms.OpenFileDialog
+                {
+                    Filter = @"Executables (*.exe)|*.exe",
+                    FilterIndex = 1,
+                    Multiselect = false
+                };
             dialog.ShowDialog();
-            String fileName = dialog.FileName;
+            var fileName = dialog.FileName;
 
-            Game game = (Game) gameList.SelectedItem;
-            game.executable = fileName;
-            Button button = (Button) sender;
-            System.Windows.Controls.Grid grid = (System.Windows.Controls.Grid) button.Parent;
-            TextBlock textBlock = grid.Children.OfType<TextBlock>().First();
+            var game = (Game) gameList.SelectedItem;
+            game.Executable = fileName;
+            var button = (Button) sender;
+            var grid = (Grid) button.Parent;
+            var textBlock = grid.Children.OfType<TextBlock>().First();
             textBlock.Text = fileName;
-            serverSaveButtonUpdateEnable();
+            ServerSaveButtonUpdateEnable();
         }
 
-        private void linkText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void LinkText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            linkOpen("http://www.thehellnet.org/");
+            LinkOpen("http://www.thehellnet.org/");
         }
 
         private void GameSelectComboBox_Initialized(object sender, EventArgs e)
         {
-            ComboBox comboBox = (ComboBox) sender;
-            data.games.ForEach(game => comboBox.Items.Add(game.tag));
+            var comboBox = (ComboBox) sender;
+            _data.Games.ForEach(game => comboBox.Items.Add(game.Tag));
         }
 
-        private void setPingElementsEnable(bool status)
+        private void SetPingElementsEnable(bool status)
         {
             if (status)
             {
@@ -286,62 +284,62 @@ namespace ThnOlgLauncher
             }
         }
 
-        private void serverLaunchButton_Click(object sender, RoutedEventArgs e)
+        private void ServerLaunchButton_Click(object sender, RoutedEventArgs e)
         {
-            launchServer();
+            LaunchServer();
         }
 
-        private void gameLaunchButton_Click(object sender, RoutedEventArgs e)
+        private void GameLaunchButton_Click(object sender, RoutedEventArgs e)
         {
-            launchGame();
+            LaunchGame();
         }
 
-        private void serverSaveButton_Click(object sender, RoutedEventArgs e)
+        private void ServerSaveButton_Click(object sender, RoutedEventArgs e)
         {
-            jsonStorage.saveJsonServers(data);
-            serverSaveButtonUpdateEnable();
+            _jsonStorage.SaveJsonServers(_data);
+            ServerSaveButtonUpdateEnable();
         }
 
-        private void gameSaveButton_Click(object sender, RoutedEventArgs e)
+        private void GameSaveButton_Click(object sender, RoutedEventArgs e)
         {
-            jsonStorage.saveJsonGames(data);
-            gameSaveButtonUpdateEnable();
+            _jsonStorage.SaveJsonGames(_data);
+            GameSaveButtonUpdateEnable();
         }
 
-        private void updatePingButton_Click(object sender, RoutedEventArgs e)
+        private void UpdatePingButton_Click(object sender, RoutedEventArgs e)
         {
-            updateServerPingAndPlayers();
+            UpdateServerPingAndPlayers();
         }
 
-        private void serverListSelectionChange(object sender, SelectionChangedEventArgs e)
+        private void ServerListSelectionChange(object sender, SelectionChangedEventArgs e)
         {
-            serverListUpdate(sender, e);
-            setServerMoveButtonStatus(true);
+            ServerListUpdate(sender, e);
+            SetServerMoveButtonStatus(true);
         }
 
-        private void serverMoveDownButton_Click(object sender, RoutedEventArgs e)
+        private void ServerMoveDownButton_Click(object sender, RoutedEventArgs e)
         {
-            int index = serverList.SelectedIndex;
-            Server tempServer = data.servers[index];
-            data.servers[index] = data.servers[index + 1];
-            data.servers[index + 1] = tempServer;
+            var index = serverList.SelectedIndex;
+            var tempServer = _data.Servers[index];
+            _data.Servers[index] = _data.Servers[index + 1];
+            _data.Servers[index + 1] = tempServer;
             serverList.Items.Refresh();
-            setServerMoveButtonStatus(true);
+            SetServerMoveButtonStatus(true);
         }
 
-        private void serverMoveUpButton_Click(object sender, RoutedEventArgs e)
+        private void ServerMoveUpButton_Click(object sender, RoutedEventArgs e)
         {
-            int index = serverList.SelectedIndex;
-            Server tempServer = data.servers[index];
-            data.servers[index] = data.servers[index - 1];
-            data.servers[index - 1] = tempServer;
+            var index = serverList.SelectedIndex;
+            var tempServer = _data.Servers[index];
+            _data.Servers[index] = _data.Servers[index - 1];
+            _data.Servers[index - 1] = tempServer;
             serverList.Items.Refresh();
-            setServerMoveButtonStatus(true);
+            SetServerMoveButtonStatus(true);
         }
 
-        private void integrityFileButton_Click(object sender, RoutedEventArgs e)
+        private void IntegrityFileButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog
+            var dialog = new System.Windows.Forms.OpenFileDialog
             {
                 Filter = @"All hash file (*.md5, *.sha1, *.sha256, *.sha512)|*.md5;*.sha1;*.sha256;*.sha512;
                 |MD5 hash file (*.md5)|*.md5
@@ -352,26 +350,26 @@ namespace ThnOlgLauncher
                 Multiselect = false
             };
             dialog.ShowDialog();
-            String fileName = dialog.FileName;
+            var fileName = dialog.FileName;
 
             integrityFileText.Text = fileName;
         }
 
-        private void integrityCheckButton_Click(object sender, RoutedEventArgs e)
+        private void IntegrityCheckButton_Click(object sender, RoutedEventArgs e)
         {
         }
 
-        private void integrityCalculateButton_Click(object sender, RoutedEventArgs e)
+        private void IntegrityCalculateButton_Click(object sender, RoutedEventArgs e)
         {
         }
 
-        private void integrityStopButton_Click(object sender, RoutedEventArgs e)
+        private void IntegrityStopButton_Click(object sender, RoutedEventArgs e)
         {
         }
 
-        private void integrityButtonsEnable()
+        private void IntegrityButtonsEnable()
         {
-            var threadRunning = integrityThread != null && integrityThread.IsAlive;
+            var threadRunning = _integrityThread != null && _integrityThread.IsAlive;
 
             if (threadRunning)
             {

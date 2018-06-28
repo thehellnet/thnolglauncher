@@ -1,27 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Script.Serialization;
+﻿using System.Web.Script.Serialization;
 
 namespace ThnOlgLauncher.model
 {
-    class Server {
+    internal class Server
+    {
+        public string Name { get; set; }
+        public string GameTag { get; set; }
+        public string Address { get; set; }
+        public ushort Port { get; set; }
 
-        public String name { get; set; }
-        public String gameTag { get; set; }
-        public String address { get; set; }
-        public UInt16 port { get; set; }
+        [ScriptIgnore] public int Ping { get; set; }
 
-        [ScriptIgnore]
-        public int ping { get; set; }
+        [ScriptIgnore] public string Players { get; set; }
 
-        [ScriptIgnore]
-        public String players { get; set; }
-
-        [ScriptIgnore]
-        public String map { get; set; }
+        [ScriptIgnore] public string Map { get; set; }
     }
 }

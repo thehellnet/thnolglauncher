@@ -1,72 +1,85 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using ThnOlgLauncher.model;
 
-namespace ThnOlgLauncher.pinger {
-    class Pinger {
-        public static PingResult pingServer(Server server) {
-            PingResult pingResult = new PingResult();
+namespace ThnOlgLauncher.pinger
+{
+    internal class Pinger
+    {
+        public static PingResult PingServer(Server server)
+        {
+            var pingResult = new PingResult();
 
-            UdpClient sck = new UdpClient();
-            sck.Client.ReceiveTimeout = 500;
-            try {
-                sck.Connect(server.address, server.port);
-            } catch(SocketException e) {
+            var sck = new UdpClient {Client = {ReceiveTimeout = 500}};
+            try
+            {
+                sck.Connect(server.Address, server.Port);
+            }
+            catch (SocketException e)
+            {
                 Console.WriteLine(e.StackTrace);
                 return pingResult;
             }
 
-            Byte[] sendBytes = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0x67, 0x65, 0x74, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x0A };
+            var sendBytes = new byte[]
+                {0xFF, 0xFF, 0xFF, 0xFF, 0x67, 0x65, 0x74, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x0A};
 
-            DateTime timeStart = DateTime.Now;
-            try {
+            var timeStart = DateTime.Now;
+            try
+            {
                 sck.Send(sendBytes, sendBytes.Length);
-            } catch(Exception e) {
+            }
+            catch (Exception e)
+            {
                 Console.WriteLine(e.StackTrace);
                 return pingResult;
             }
 
-            IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            var remoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
             byte[] recvData;
-            try {
-                recvData = sck.Receive(ref RemoteIpEndPoint);
-            } catch(Exception e) {
+            try
+            {
+                recvData = sck.Receive(ref remoteIpEndPoint);
+            }
+            catch (Exception e)
+            {
                 Console.WriteLine(e.StackTrace);
                 return pingResult;
             }
 
-            DateTime timeStop = DateTime.Now;
-            string returnData = Encoding.ASCII.GetString(recvData);
+            var timeStop = DateTime.Now;
+            var returnData = Encoding.ASCII.GetString(recvData);
             sck.Close();
 
             Console.WriteLine(returnData);
 
-            TimeSpan timeSpan = timeStop - timeStart;
-            pingResult.ping = (int) timeSpan.TotalMilliseconds;
+            var timeSpan = timeStop - timeStart;
+            pingResult.Ping = (int) timeSpan.TotalMilliseconds;
 
-            String[] rows = returnData.Split('\n');
-            pingResult.players = rows.Length - 3;
+            var rows = returnData.Split('\n');
+            pingResult.Players = rows.Length - 3;
 
-            String[] serverConfig = rows[1].Split('\\');
-            for(int i = 1; (i + 1) < serverConfig.Length; i += 2) {
-                String param = serverConfig[i];
-                String value = serverConfig[i + 1];
-                switch(param) {
-                    case "sv_maxclients":
-                        Console.WriteLine("{0} {1}", param, value);
-                        pingResult.maxPlayers = Int32.Parse(value);
+            var serverConfig = rows[1].Split('\\');
+            for (var i = 1; (i + 1) < serverConfig.Length; i += 2)
+            {
+                var param = serverConfig[i];
+                var value = serverConfig[i + 1];
+                switch (param)
+                {
+                    case @"sv_maxclients":
+                        Console.WriteLine(@"{0} {1}", param, value);
+                        pingResult.MaxPlayers = int.Parse(value);
                         break;
-                    case "g_gametype":
-                        pingResult.gametype = value;
+                    case @"g_gametype":
+                        pingResult.Gametype = value;
                         break;
-                    case "mapname":
-                        pingResult.map = value;
+                    case @"mapname":
+                        pingResult.Map = value;
                         break;
+                    default:
+                        continue;
                 }
             }
 

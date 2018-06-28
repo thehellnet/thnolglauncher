@@ -2,14 +2,15 @@
 
 namespace ThnOlgLauncher.model
 {
-    class DataStore
+    internal class DataStore
     {
-        public List<Game> games { get; set; }
-        public List<Server> servers { get; set; }
+        public List<Game> Games { get; set; }
+        public List<Server> Servers { get; set; }
 
-        public DataStore() {
-            games = new List<Game>();
-            servers = new List<Server>();
+        public DataStore()
+        {
+            Games = new List<Game>();
+            Servers = new List<Server>();
         }
     }
 }
